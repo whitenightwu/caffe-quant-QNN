@@ -405,6 +405,8 @@ message LayerParameter {
   optional ThresholdParameter threshold_param = 128;
   optional TileParameter tile_param = 138;
   optional WindowDataParameter window_data_param = 129;
+
+  optional QuantizationParameter quantization_param = 180;
 }
 
 // Message that stores parameters used to apply transformation
@@ -1409,4 +1411,48 @@ message PReLUParameter {
   optional FillerParameter filler = 1;
   // Whether or not slope parameters are shared across channels.
   optional bool channel_shared = 2 [default = false];
+}
+
+message QuantizationParameter {
+	// Quantization Scheme adopted in the quantization layer
+	
+	// Round method of quantization
+	enum RoundMethod {
+    	ROUND = 0;
+    	FLOOR = 1;
+    	CEIL = 2;
+    	TRUNC = 3;
+  	}
+  	optional RoundMethod round_method = 1 [default = ROUND]; 
+  	
+  	// Round strategy of quantization 
+	enum RoundStrategy {
+		CONSERVATIVE = 0;
+		NEUTRAL = 1;
+		AGGRESSIVE = 2;
+	}
+	optional RoundStrategy round_strategy = 2 [default = CONSERVATIVE];
+	
+	// Total bit width (including sign bit, integer part, and fraction part)
+	optional int32 bit_width = 3 [default = 0];
+	
+	// Range of input data 
+	repeated float range = 4 [packed = true];
+}
+
+message QuanInnerProductParameter {
+  optional uint32 num_output = 1; // The number of outputs for the layer
+  optional bool bias_term = 2 [default = true]; // whether to have bias terms
+  optional FillerParameter weight_filler = 3; // The filler for the weight
+  optional FillerParameter bias_filler = 4; // The filler for the bias
+
+  // The first axis to be lumped into a single inner product computation;
+  // all preceding axes are retained in the output.
+  // May be negative to index from the end (e.g., -1 for the last axis).
+  optional int32 axis = 5 [default = 1];
+  // Specify whether to transpose the weight matrix or not.
+  // If transpose == true, any operations will be performed on the transpose
+  // of the weight matrix. The weight matrix itself is not going to be transposed
+  // but rather the transfer flag of operations will be toggled accordingly.
+  optional bool transpose = 6 [default = false];
 }
