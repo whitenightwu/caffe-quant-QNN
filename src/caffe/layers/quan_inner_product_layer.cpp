@@ -1,7 +1,7 @@
 #include <vector>
 
 #include "caffe/filler.hpp"
-#include "caffe/layers/inner_product_layer.hpp"
+#include "caffe/layers/quan_inner_product_layer.hpp"
 #include "caffe/util/math_functions.hpp"
 
 #include <iostream>
@@ -9,21 +9,21 @@
 #include <limits>
 
 
-
 namespace caffe {
 
 template <typename Dtype>
-void InnerProductLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+void QuanInnerProductLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-  const int num_output = this->layer_param_.inner_product_param().num_output();
-  bias_term_ = this->layer_param_.inner_product_param().bias_term();
-  transpose_ = this->layer_param_.inner_product_param().transpose();
+  const int num_output = this->layer_param_.quan_inner_product_param().num_output();
+  bias_term_ = this->layer_param_.quan_inner_product_param().bias_term();
+  transpose_ = this->layer_param_.quan_inner_product_param().transpose();
   N_ = num_output;
+  LOG(INFO) << num_output << "   " << N_;
   const int axis = bottom[0]->CanonicalAxisIndex(
-      this->layer_param_.inner_product_param().axis());
+      this->layer_param_.quan_inner_product_param().axis());
   // Dimensions starting from "axis" are "flattened" into a single
   // length K_ vector. For example, if bottom[0]'s shape is (N, C, H, W),
-  // and axis == 1, N inner products with dimension CHW are performed.
+  // and axis == 1, N quan_inner products with dimension CHW are performed.
   K_ = bottom[0]->count(axis);
   // Check if we need to set up the weights
   if (this->blobs_.size() > 0) {
@@ -43,17 +43,21 @@ void InnerProductLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       weight_shape[0] = N_;
       weight_shape[1] = K_;
     }
+    LOG(INFO) << N_ << "+++++" << K_ << "++++" << M_;
     this->blobs_[0].reset(new Blob<Dtype>(weight_shape));
+    LOG(INFO) << "=========4";
     // fill the weights
     shared_ptr<Filler<Dtype> > weight_filler(GetFiller<Dtype>(
-        this->layer_param_.inner_product_param().weight_filler()));
+        this->layer_param_.quan_inner_product_param().weight_filler()));
+    LOG(INFO) << "=========5";
     weight_filler->Fill(this->blobs_[0].get());
+    LOG(INFO) << "=========6";
     // If necessary, intiialize and fill the bias term
     if (bias_term_) {
       vector<int> bias_shape(1, N_);
       this->blobs_[1].reset(new Blob<Dtype>(bias_shape));
       shared_ptr<Filler<Dtype> > bias_filler(GetFiller<Dtype>(
-          this->layer_param_.inner_product_param().bias_filler()));
+          this->layer_param_.quan_inner_product_param().bias_filler()));
       bias_filler->Fill(this->blobs_[1].get());
     }
   }  // parameter initialization
@@ -61,15 +65,15 @@ void InnerProductLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 }
 
 template <typename Dtype>
-void InnerProductLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
+void QuanInnerProductLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   // Figure out the dimensions
   const int axis = bottom[0]->CanonicalAxisIndex(
-      this->layer_param_.inner_product_param().axis());
+      this->layer_param_.quan_inner_product_param().axis());
   const int new_K = bottom[0]->count(axis);
   CHECK_EQ(K_, new_K)
-      << "Input size incompatible with inner product parameters.";
-  // The first "axis" dimensions are independent inner products; the total
+      << "Input size incompatible with quan_inner product parameters.";
+  // The first "axis" dimensions are independent quan_inner products; the total
   // number of these is M_, the product over these dimensions.
   M_ = bottom[0]->count(0, axis);
   // The top shape will be the bottom shape with the flattened axes dropped,
@@ -102,11 +106,6 @@ void InnerProductLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
     Dtype max_value = 0;
 
     /******************************************/
-    //Linear_quant
-    /*
-    double range_low_ = -0.4;
-    double range_high_ = 0.4;
-    */
     double bit_width_ = 4;
 
     // smart choosing between 2s complement encoding or unsigned encoding
@@ -146,13 +145,12 @@ void InnerProductLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 
 
 
-
-
-
 template <typename Dtype>
-void InnerProductLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+void QuanInnerProductLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
 
+  const Dtype* bottom_data = bottom[0]->cpu_data();
+  Dtype* top_data = top[0]->mutable_cpu_data();
   /**************************************/
   Dtype* tmp_weight = (Dtype*) malloc((this->blobs_[0]->count())*sizeof(Dtype));
   caffe_copy(this->blobs_[0]->count(), this->blobs_[0]->cpu_data(), tmp_weight);
@@ -189,9 +187,6 @@ void InnerProductLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   for (int i = 0; i < 1; ++i) 
     std::cout << "comput--fc_weight" << weight[i] << std::endl;
 
-
-  const Dtype* bottom_data = bottom[0]->cpu_data();
-  Dtype* top_data = top[0]->mutable_cpu_data();
   caffe_cpu_gemm<Dtype>(CblasNoTrans, transpose_ ? CblasNoTrans : CblasTrans,
       M_, N_, K_, (Dtype)1.,
       bottom_data, weight, (Dtype)0., top_data);
@@ -203,7 +198,7 @@ void InnerProductLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 }
 
 template <typename Dtype>
-void InnerProductLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
+void QuanInnerProductLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
   if (this->param_propagate_down_[0]) {
@@ -247,10 +242,10 @@ void InnerProductLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 }
 
 #ifdef CPU_ONLY
-STUB_GPU(InnerProductLayer);
+STUB_GPU(QuanInnerProductLayer);
 #endif
 
-INSTANTIATE_CLASS(InnerProductLayer);
-REGISTER_LAYER_CLASS(InnerProduct);
+  INSTANTIATE_CLASS(QuanInnerProductLayer);
+  REGISTER_LAYER_CLASS(QuanInnerProduct);
 
 }  // namespace caffe

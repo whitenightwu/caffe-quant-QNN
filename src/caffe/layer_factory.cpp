@@ -15,6 +15,7 @@
 #include "caffe/layers/softmax_layer.hpp"
 #include "caffe/layers/tanh_layer.hpp"
 #include "caffe/proto/caffe.pb.h"
+#include "caffe/layers/quan_conv_layer.hpp"
 
 #ifdef USE_CUDNN
 #include "caffe/layers/cudnn_conv_layer.hpp"
@@ -72,6 +73,68 @@ shared_ptr<Layer<Dtype> > GetConvolutionLayer(
 }
 
 REGISTER_LAYER_CREATOR(Convolution, GetConvolutionLayer);
+
+
+// Get quanconvolution layer according to engine.
+template <typename Dtype>
+shared_ptr<Layer<Dtype> > GetQuanConvolutionLayer(
+    const LayerParameter& param) {
+  QuanConvolutionParameter quan_conv_param = param.quan_convolution_param();
+  QuanConvolutionParameter_Engine engine = quan_conv_param.engine();
+#ifdef USE_CUDNN
+  bool use_dilation = false;
+  for (int i = 0; i < quan_conv_param.dilation_size(); ++i) {
+    if (quan_conv_param.dilation(i) > 1) {
+      use_dilation = true;
+    }
+  }
+#endif
+  if (engine == QuanConvolutionParameter_Engine_DEFAULT) {
+    engine = QuanConvolutionParameter_Engine_CAFFE;
+#ifdef USE_CUDNN
+    if (!use_dilation) {
+      engine = QuanConvolutionParameter_Engine_CUDNN;
+    }
+#endif
+  }
+  if (engine == QuanConvolutionParameter_Engine_CAFFE) {
+    return shared_ptr<Layer<Dtype> >(new QuanConvolutionLayer<Dtype>(param));
+#ifdef USE_CUDNN
+  } else if (engine == QuanConvolutionParameter_Engine_CUDNN) {
+    if (use_dilation) {
+      LOG(FATAL) << "CuDNN doesn't support the dilated Quanconvolution at Layer "
+                 << param.name();
+    }
+    return shared_ptr<Layer<Dtype> >(new CuDNNQuanConvolutionLayer<Dtype>(param));
+#endif
+  } else {
+    LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
+    throw;  // Avoids missing return warning
+  }
+}
+
+REGISTER_LAYER_CREATOR(QuanConvolution, GetQuanConvolutionLayer);
+
+  /*
+// Get QuanInnerProduct layer according to engine.
+template <typename Dtype>
+shared_ptr<Layer<Dtype> > GetQuanInnerProductLayer(
+    const LayerParameter& param) {
+  QuanInnerProductParameter quan_fc_param = param.quan_inner_product_param();
+#ifdef USE_CUDNN
+  bool use_dilation = false;
+  for (int i = 0; i < quan_fc_param.dilation_size(); ++i) {
+    if (quan_fc_param.dilation(i) > 1) {
+      use_dilation = true;
+    }
+  }
+#endif
+
+}
+
+REGISTER_LAYER_CREATOR(QuanInnerProduct, GetQuanInnerProductLayer);
+*/
+
 
 // Get pooling layer according to engine.
 template <typename Dtype>

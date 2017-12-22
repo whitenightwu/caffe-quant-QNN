@@ -395,8 +395,10 @@ void Solver<Dtype>::Test(const int test_net_id) {
       loss_msg_stream << " (* " << loss_weight
                       << " = " << loss_weight * mean_score << " loss)";
     }
-    //    LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
-    //        << mean_score << loss_msg_stream.str();
+
+    if(output_name != "probs")
+       LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
+           << mean_score << loss_msg_stream.str();
   }
 }
 

@@ -1,1 +1,1 @@
-grep acc ydwu/tmp.log > ydwu/tmp-acc.log
+grep acc ydwu/train.log > ydwu/train-acc.log

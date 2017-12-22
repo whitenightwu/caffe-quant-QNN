@@ -1,0 +1,655 @@
+layer {
+  name: "data"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TRAIN
+  }
+  transform_param {
+    mirror: false
+    crop_size: 227
+    mean_file: "/home/ydwu/database/imagenet/ilsvrc12/imagenet_mean.binaryproto"
+  }
+  data_param {
+    source: "/home/ydwu/database/imagenet/ilsvrc12/lmdb_resize/ilsvrc12_train_lmdb/"
+    batch_size: 32
+    backend: LMDB
+  }
+}
+
+layer {
+  name: "data"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    mirror: false
+    crop_size: 227
+    mean_file: "/home/ydwu/database/imagenet/ilsvrc12/imagenet_mean.binaryproto"
+  }
+  data_param {
+    source: "/home/ydwu/database/imagenet/ilsvrc12/lmdb_resize/ilsvrc12_val_lmdb/"
+    batch_size: 20
+    backend: LMDB
+  }
+}
+
+layer {
+  name: "quantized_data"
+  type: "Quantization"
+  bottom: "data"
+  top: "quantized_data"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -129.935256958
+    range: 160.789123535
+  }
+}
+layer {
+  name: "conv1"
+  type: "QuanConvolution"
+  bottom: "quantized_data"
+  top: "conv1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 96
+    pad: 0
+    kernel_size: 11
+    group: 1
+    stride: 4
+    weight_filler {
+      type: "gaussian"
+      std: 10999999977648
+    }
+    bias_filler {
+      type: "constant"
+      std: 0.10000000149
+    }
+  }
+}
+layer {
+  name: "quantized_conv1"
+  type: "Quantization"
+  bottom: "conv1"
+  top: "quantized_conv1"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -2732.73510742
+    range: 2531.04199219
+  }
+}
+layer {
+  name: "relu1"
+  type: "ReLU"
+  bottom: "quantized_conv1"
+  top: "relu1"
+}
+layer {
+  name: "quantized_relu1"
+  type: "Quantization"
+  bottom: "relu1"
+  top: "quantized_relu1"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 1
+    range: 2531.04199219
+  }
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "quantized_relu1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "quantized_pool1"
+  type: "Quantization"
+  bottom: "pool1"
+  top: "quantized_pool1"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 1
+    range: 2531.04199219
+  }
+}
+layer {
+  name: "norm1"
+  type: "LRN"
+  bottom: "quantized_pool1"
+  top: "norm1"
+  lrn_param {
+    local_size: 5
+    alpha: 9.99999974738e-05
+    beta: 0.75
+  }
+}
+layer {
+  name: "quantized_norm1"
+  type: "Quantization"
+  bottom: "norm1"
+  top: "quantized_norm1"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 1
+    range: 138.705764771
+  }
+}
+layer {
+  name: "conv2"
+  type: "QuanConvolution"
+  bottom: "quantized_norm1"
+  top: "conv2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    pad: 2
+    kernel_size: 5
+    group: 2
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 10999999977648
+    }
+    bias_filler {
+      type: "constant"
+      std: 0.10000000149
+    }
+  }
+}
+layer {
+  name: "quantized_conv2"
+  type: "Quantization"
+  bottom: "conv2"
+  top: "quantized_conv2"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -647.61907959
+    range: 492.231109619
+  }
+}
+layer {
+  name: "relu2"
+  type: "ReLU"
+  bottom: "quantized_conv2"
+  top: "relu2"
+}
+layer {
+  name: "quantized_relu2"
+  type: "Quantization"
+  bottom: "relu2"
+  top: "quantized_relu2"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 1
+    range: 492.231109619
+  }
+}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "quantized_relu2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "quantized_pool2"
+  type: "Quantization"
+  bottom: "pool2"
+  top: "quantized_pool2"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 1
+    range: 492.231109619
+  }
+}
+layer {
+  name: "norm2"
+  type: "LRN"
+  bottom: "quantized_pool2"
+  top: "norm2"
+  lrn_param {
+    local_size: 5
+    alpha: 9.99999974738e-05
+    beta: 0.75
+  }
+}
+layer {
+  name: "quantized_norm2"
+  type: "Quantization"
+  bottom: "norm2"
+  top: "quantized_norm2"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 1
+    range: 138.726364136
+  }
+}
+layer {
+  name: "conv3"
+  type: "QuanConvolution"
+  bottom: "quantized_norm2"
+  top: "conv3"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 384
+    pad: 1
+    kernel_size: 3
+    group: 1
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 10999999977648
+    }
+    bias_filler {
+      type: "constant"
+      std: 0.10000000149
+    }
+  }
+}
+layer {
+  name: "quantized_conv3"
+  type: "Quantization"
+  bottom: "conv3"
+  top: "quantized_conv3"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -389.565155029
+    range: 331.981781006
+  }
+}
+layer {
+  name: "relu3"
+  type: "ReLU"
+  bottom: "quantized_conv3"
+  top: "relu3"
+}
+layer {
+  name: "quantized_relu3"
+  type: "Quantization"
+  bottom: "relu3"
+  top: "quantized_relu3"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 1
+    range: 331.981781006
+  }
+}
+layer {
+  name: "conv4"
+  type: "QuanConvolution"
+  bottom: "quantized_relu3"
+  top: "conv4"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 384
+    pad: 1
+    kernel_size: 3
+    group: 2
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 10999999977648
+    }
+    bias_filler {
+      type: "constant"
+      std: 0.10000000149
+    }
+  }
+}
+layer {
+  name: "quantized_conv4"
+  type: "Quantization"
+  bottom: "conv4"
+  top: "quantized_conv4"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -231.205978394
+    range: 283.871887207
+  }
+}
+layer {
+  name: "relu4"
+  type: "ReLU"
+  bottom: "quantized_conv4"
+  top: "relu4"
+}
+layer {
+  name: "quantized_relu4"
+  type: "Quantization"
+  bottom: "relu4"
+  top: "quantized_relu4"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 1
+    range: 283.871887207
+  }
+}
+layer {
+  name: "conv5"
+  type: "QuanConvolution"
+  bottom: "quantized_relu4"
+  top: "conv5"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    group: 2
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 10999999977648
+    }
+    bias_filler {
+      type: "constant"
+      std: 0.10000000149
+    }
+  }
+}
+layer {
+  name: "quantized_conv5"
+  type: "Quantization"
+  bottom: "conv5"
+  top: "quantized_conv5"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -172.605667114
+    range: 272.573150635
+  }
+}
+layer {
+  name: "relu5"
+  type: "ReLU"
+  bottom: "quantized_conv5"
+  top: "relu5"
+}
+layer {
+  name: "quantized_relu5"
+  type: "Quantization"
+  bottom: "relu5"
+  top: "quantized_relu5"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 1
+    range: 272.573150635
+  }
+}
+layer {
+  name: "pool5"
+  type: "Pooling"
+  bottom: "quantized_relu5"
+  top: "pool5"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "quantized_pool5"
+  type: "Quantization"
+  bottom: "pool5"
+  top: "quantized_pool5"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 1
+    range: 272.573150635
+  }
+}
+layer {
+  name: "fc6"
+  type: "QuanInnerProduct"
+  bottom: "quantized_pool5"
+  top: "fc6"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  quan_inner_product_param {
+    num_output: 4096
+    weight_filler {
+      type: "gaussian"
+      std: 10499999988824
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.10000000149
+    }
+  }
+}
+layer {
+  name: "quantized_fc6"
+  type: "Quantization"
+  bottom: "fc6"
+  top: "quantized_fc6"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -114.024871826
+    range: 58.5417327881
+  }
+}
+layer {
+  name: "relu6"
+  type: "ReLU"
+  bottom: "quantized_fc6"
+  top: "relu6"
+}
+layer {
+  name: "quantized_relu6"
+  type: "Quantization"
+  bottom: "relu6"
+  top: "quantized_relu6"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 1
+    range: 58.5417327881
+  }
+}
+layer {
+  name: "fc7"
+  type: "QuanInnerProduct"
+  bottom: "quantized_relu6"
+  top: "fc7"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  quan_inner_product_param {
+    num_output: 4096
+    weight_filler {
+      type: "gaussian"
+      std: 10499999988824
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.10000000149
+    }
+  }
+}
+layer {
+  name: "quantized_fc7"
+  type: "Quantization"
+  bottom: "fc7"
+  top: "quantized_fc7"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -26.0193347931
+    range: 19.1252574921
+  }
+}
+layer {
+  name: "relu7"
+  type: "ReLU"
+  bottom: "quantized_fc7"
+  top: "relu7"
+}
+layer {
+  name: "quantized_relu7"
+  type: "Quantization"
+  bottom: "relu7"
+  top: "quantized_relu7"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 1
+    range: 19.1252574921
+  }
+}
+layer {
+  name: "fc8"
+  type: "QuanInnerProduct"
+  bottom: "quantized_relu7"
+  top: "fc8"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0
+  }
+  quan_inner_product_param {
+    num_output: 1000
+  }
+}
+layer {
+  name: "quantized_fc8"
+  type: "Quantization"
+  bottom: "fc8"
+  top: "quantized_fc8"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -9.84978103638
+    range: 45.6884460449
+  }
+}
+layer {
+  name: "probs"
+  type: "Softmax"
+  bottom: "quantized_fc8"
+  top: "probs"
+}
+layer {
+  name: "loss"
+  type: "SoftmaxWithLoss"
+  bottom: "quantized_fc8"
+  bottom: "label"
+  top: "loss"
+}
+layer {
+  name: "acc_top1"
+  type: "Accuracy"
+  bottom: "quantized_fc8"
+  bottom: "label"
+  top: "acc_top1"
+  accuracy_param {
+    top_k: 1
+  }
+}
+layer {
+  name: "acc_top5"
+  type: "Accuracy"
+  bottom: "quantized_fc8"
+  bottom: "label"
+  top: "acc_top5"
+  accuracy_param {
+    top_k: 5
+  }
+}
