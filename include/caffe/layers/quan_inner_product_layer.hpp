@@ -39,6 +39,27 @@ class QuanInnerProductLayer : public Layer<Dtype> {
   bool bias_term_;
   Blob<Dtype> bias_multiplier_;
   bool transpose_;  ///< if true, assume transposed weights
+
+
+  /////////////////////////////////////////////////////////////
+  int bit_width_;	
+  float range_low_, range_high_;
+  QuanInnerProductParameter_RoundMethod round_method_;
+  QuanInnerProductParameter_RoundStrategy round_strategy_;
+
+
+  //   void Weight_Quantization(Dtype& weights, float range_low_, float range_high_, int bit_width_ , QuanInnerProductParameter_RoundStrategy round_strategy_, QuanInnerProductParameter_RoundMethod round_method_);
+  void Weight_Quantization(Dtype& weights);
+  //  void Weight_Quantization(Dtype& weights, float range_low_, float range_high_);
+  // void Weight_Quantization(Dtype& weights, float range_low_, float range_high_, int bit_width_ , int* round_strategy_, int* round_method_);
+
+  Dtype fixed_point(const Dtype& input_data, const double& scaling_factor,
+		    const double& min_value, const double& max_value) const;
+
+  void analyze_scaling_factor(double& scaling_factor, double& min_value,
+			      double& max_value) const;
+
+
 };
 
 }  // namespace caffe

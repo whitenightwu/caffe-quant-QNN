@@ -7,7 +7,7 @@
 #include <iostream>
 #include <algorithm>
 #include <limits>
-
+#include <typeinfo>
 
 namespace caffe {
 
@@ -43,15 +43,11 @@ void QuanInnerProductLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
       weight_shape[0] = N_;
       weight_shape[1] = K_;
     }
-    LOG(INFO) << N_ << "+++++" << K_ << "++++" << M_;
     this->blobs_[0].reset(new Blob<Dtype>(weight_shape));
-    LOG(INFO) << "=========4";
     // fill the weights
     shared_ptr<Filler<Dtype> > weight_filler(GetFiller<Dtype>(
         this->layer_param_.quan_inner_product_param().weight_filler()));
-    LOG(INFO) << "=========5";
     weight_filler->Fill(this->blobs_[0].get());
-    LOG(INFO) << "=========6";
     // If necessary, intiialize and fill the bias term
     if (bias_term_) {
       vector<int> bias_shape(1, N_);
@@ -62,6 +58,18 @@ void QuanInnerProductLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
     }
   }  // parameter initialization
   this->param_propagate_down_.resize(this->blobs_.size(), true);
+
+  /***********************get paramerats*************************/
+  // parses the parameters from *.prototxt and quick sanity check
+  bit_width_ = this->layer_param_.quan_inner_product_param().bit_width();
+  CHECK_GT(bit_width_, 0) << type() << " Layer has unexpected negative bit width";
+
+  round_method_ = this->layer_param_.quan_inner_product_param().round_method();
+  round_strategy_ = this->layer_param_.quan_inner_product_param().round_strategy();
+
+  // read range
+  range_low_ = this->layer_param_.quan_inner_product_param().range_low();
+  range_high_ = this->layer_param_.quan_inner_product_param().range_high();
 }
 
 template <typename Dtype>
@@ -90,23 +98,14 @@ void QuanInnerProductLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   }
 }
 
-
-
   template <typename Dtype>
-  void Weight_Quantization(Dtype& weights, Dtype range_low_, Dtype range_high_)
+void QuanInnerProductLayer<Dtype>::Weight_Quantization(Dtype& weights)
   {
-    // rounded results of input data
-    /*
-      double* scaling_factor = 0;
-      double* min_value = 0;
-      double* max_value = 0;
-    */
     Dtype scaling_factor = 0;
     Dtype min_value = 0;
     Dtype max_value = 0;
 
     /******************************************/
-    double bit_width_ = 4;
 
     // smart choosing between 2s complement encoding or unsigned encoding
     if (range_low_ >= 0.0) {
@@ -131,17 +130,125 @@ void QuanInnerProductLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       std::numeric_limits<Dtype>::infinity();
     Dtype pos_scaling_factor = (range_high_ > 0) ? log2(max_value/range_high_) :
       std::numeric_limits<Dtype>::infinity();
-    scaling_factor = pow((Dtype)2.0, round(std::min(neg_scaling_factor, pos_scaling_factor)));
-
+    
+    switch (round_strategy_)
+      {
+      case QuanInnerProductParameter_RoundStrategy_CONSERVATIVE:
+	scaling_factor = pow(2.0, floor(std::min(neg_scaling_factor, pos_scaling_factor)));
+	break;
+      case QuanInnerProductParameter_RoundStrategy_NEUTRAL:
+	scaling_factor = pow(2.0, round(std::min(neg_scaling_factor, pos_scaling_factor)));
+	break;
+      case QuanInnerProductParameter_RoundStrategy_AGGRESSIVE:
+	scaling_factor = pow(2.0, ceil(std::min(neg_scaling_factor, pos_scaling_factor)));
+	break;
+      default:
+	LOG(FATAL) << "Unknown round strategy.";
+      }
     /******************************************/
 
     Dtype weight_rounded;
-    weight_rounded = round(weights * scaling_factor);
- 
+     
+    switch (round_method_) 
+      {
+      case QuanInnerProductParameter_RoundMethod_ROUND:
+	weight_rounded = round(weights * (Dtype)scaling_factor);
+	break;
+      case QuanInnerProductParameter_RoundMethod_FLOOR:
+	weight_rounded = floor(weights * (Dtype)scaling_factor);
+	break;
+      case QuanInnerProductParameter_RoundMethod_CEIL:
+	weight_rounded = ceil(weights * (Dtype)scaling_factor);
+	break;
+      case QuanInnerProductParameter_RoundMethod_TRUNC:
+	weight_rounded = trunc(weights * (Dtype)scaling_factor);
+	break;
+      default:
+	LOG(FATAL) << "Unknown round method.";
+      }
+    
+    weight_rounded = floor(weights * (Dtype)scaling_factor);
     // y = clip(x, min, max) / scaling_factor; so y in [min/scaling_factor, max/scaling_factor]
     weights = std::min(std::max((Dtype)weight_rounded, (Dtype)(min_value)), (Dtype)(max_value)) /
       (Dtype)(scaling_factor);
   }
+
+
+  /*
+template <typename Dtype>
+void analyze_scaling_factor(double& scaling_factor,
+		double& min_value, double& max_value) const {
+	// smart choosing between 2s complement encoding or unsigned encoding
+	if (range_low_ >= 0.0) {
+		// non-negative input range with unsigned range [0, 2^N-1]
+		min_value = 0.0;
+		max_value = pow(2.0, bit_width_) - 1.0;
+	} else if (range_high_ <= 0.0) {
+		// non-positive input range with unsigned range [-2^N+1, 0]
+		min_value = -pow(2.0, bit_width_) + 1.0;
+		max_value = 0.0;
+	} else {
+		// N-bit 2s complement can represent the integer between -2^(N-1)
+		// to 2^(N-1)-1
+		min_value = -pow(2.0, bit_width_-1);
+		max_value = pow(2.0, bit_width_-1) - 1.0;
+	}
+
+	// analyze the scaling factor based on min(max)value and range
+	// scaling factor should be power of 2
+	double neg_scaling_factor = (range_low_ < 0) ? log2(min_value/range_low_) :
+			std::numeric_limits<double>::infinity();
+	double pos_scaling_factor = (range_high_ > 0) ? log2(max_value/range_high_) :
+			std::numeric_limits<double>::infinity();
+
+	switch (round_strategy_) {
+	case QuanInnerProductParameter_RoundStrategy_CONSERVATIVE:
+		scaling_factor = pow(2.0, floor(std::min(neg_scaling_factor, pos_scaling_factor)));
+		break;
+	case QuanInnerProductParameter_RoundStrategy_NEUTRAL:
+		scaling_factor = pow(2.0, round(std::min(neg_scaling_factor, pos_scaling_factor)));
+		break;
+	case QuanInnerProductParameter_RoundStrategy_AGGRESSIVE:
+		scaling_factor = pow(2.0, ceil(std::min(neg_scaling_factor, pos_scaling_factor)));
+		break;
+	default:
+		LOG(FATAL) << "Unknown round strategy.";
+	}
+
+}
+
+
+template <typename Dtype>
+Dtype fixed_point(const Dtype& input_data,
+		const double& scaling_factor, const double& min_value,
+		const double& max_value) const {
+	// rounded results of input data
+	double input_data_rounded;
+
+	switch (round_method_) {
+	case QuanInnerProductParameter_RoundMethod_ROUND:
+		input_data_rounded = round(input_data * (Dtype)scaling_factor);
+		break;
+	case QuanInnerProductParameter_RoundMethod_FLOOR:
+		input_data_rounded = floor(input_data * (Dtype)scaling_factor);
+		break;
+	case QuanInnerProductParameter_RoundMethod_CEIL:
+		input_data_rounded = ceil(input_data * (Dtype)scaling_factor);
+		break;
+	case QuanInnerProductParameter_RoundMethod_TRUNC:
+		input_data_rounded = trunc(input_data * (Dtype)scaling_factor);
+		break;
+	default:
+		LOG(FATAL) << "Unknown round method.";
+	}
+
+	return std::min(std::max(input_data_rounded, min_value), max_value) /
+			(Dtype)scaling_factor;
+}
+
+*/
+
+
 
 
 
@@ -151,42 +258,52 @@ void QuanInnerProductLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
 
   const Dtype* bottom_data = bottom[0]->cpu_data();
   Dtype* top_data = top[0]->mutable_cpu_data();
-  /**************************************/
+
+  /***********************get range*************************/
+  //  LOG(INFO) << "range_high_ =" << range_high_ << ";range_low_ =" << range_low_;
   Dtype* tmp_weight = (Dtype*) malloc((this->blobs_[0]->count())*sizeof(Dtype));
   caffe_copy(this->blobs_[0]->count(), this->blobs_[0]->cpu_data(), tmp_weight);
-
-  Dtype* sort_weight = tmp_weight;
-  int qcount_ = this->blobs_[0]->count();
-  std::sort(sort_weight, sort_weight+(this->blobs_[0]->count()));
-  Dtype range_high_ = sort_weight[qcount_-1];
-  Dtype range_low_ = sort_weight[0];
-  /*
-    for (int i = 0; i < 1; ++i)
-    { 
-    std::cout << "old--cpu_data" << this->blobs_[0]->cpu_data()[i] << std::endl;
-    //	std::cout << "tmp_weight" << tmp_weight[i] << std::endl;
+  Dtype* Q_weight = const_cast<Dtype*>(tmp_weight);
+  // get range_high_ and range_low_.
+  if(range_high_ == range_low_ )
+    {
+      Dtype* sort_weight = tmp_weight;
+      int qcount_ = this->blobs_[0]->count();
+      std::sort(sort_weight, sort_weight+(this->blobs_[0]->count()));
+      range_high_ = sort_weight[qcount_-1];
+      range_low_ = sort_weight[0];
     }
+   LOG(INFO) << "range_high_ =" << range_high_ << ";range_low_ =" << range_low_;
+
+
+  /***********************quantized*************************/
+  ////////////////////////origine///////////////////////
+  /*
+  double scaling_factor, min_value, max_value;
+  analyze_scaling_factor(scaling_factor, min_value, max_value);
+
+  // apply quantization element-wise
+  for (int i = 0; i < (this->blobs_[0]->count()); ++i) {
+    Q_weight[i] = fixed_point(Q_weight[i], scaling_factor,
+			      min_value, max_value);
+  }
   */
 
-  Dtype* Q_weight = const_cast<Dtype*>(tmp_weight);
   for (int i = 0; i < (this->blobs_[0]->count()); ++i) 
     {
-      Weight_Quantization(*Q_weight, range_low_, range_high_);
+      Weight_Quantization(*(Q_weight+i));
     }
   const Dtype *weight = Q_weight;
-  for (int i = 0; i < 1; ++i) 
-    {
-      std::cout << "fc_max:" << range_high_ << "  " << "fc_min:" << range_low_ << std::endl;
-      std::cout << "new--fc_cpu_data" << this->blobs_[0]->cpu_data()[i] << std::endl;
-    }
+
+  /***********************print*************************/
+  //  std::cout << "fc_max:" << range_high_ << "  " << "fc_min:" << range_low_ << std::endl;
+  // for (int i = 0; i < 5; ++i) 
+  //   {
+  //     std::cout << "weight:" << this->blobs_[0]->cpu_data()[i] << std::endl;
+  //     std::cout << "qnn_weight:" << weight[i] << std::endl;
+  //   }
  
-  /**************************************/
-  // const Dtype* weight = this->blobs_[0]->cpu_data();
-
-  //print weight to scence
-  for (int i = 0; i < 1; ++i) 
-    std::cout << "comput--fc_weight" << weight[i] << std::endl;
-
+  /*****************************************************/
   caffe_cpu_gemm<Dtype>(CblasNoTrans, transpose_ ? CblasNoTrans : CblasTrans,
       M_, N_, K_, (Dtype)1.,
       bottom_data, weight, (Dtype)0., top_data);

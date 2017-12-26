@@ -46,14 +46,14 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: -129.935256958
     range: 160.789123535
   }
 }
 layer {
   name: "conv1"
-  type: "QuanConvolution"
+  type: "Convolution"
   bottom: "quantized_data"
   top: "conv1"
   param {
@@ -64,7 +64,7 @@ layer {
     lr_mult: 2
     decay_mult: 0
   }
-  quan_convolution_param {
+  convolution_param {
     num_output: 96
     pad: 0
     kernel_size: 11
@@ -78,9 +78,6 @@ layer {
       type: "constant"
       std: 0.10000000149
     }
-    bit_width: 5
-    range_high: 0.402661
-    range_low: -0.373572
   }
 }
 layer {
@@ -91,7 +88,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: -2732.73510742
     range: 2531.04199219
   }
@@ -110,7 +107,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: 1
     range: 2531.04199219
   }
@@ -134,7 +131,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: 1
     range: 2531.04199219
   }
@@ -158,14 +155,14 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: 1
     range: 138.705764771
   }
 }
 layer {
   name: "conv2"
-  type: "QuanConvolution"
+  type: "Convolution"
   bottom: "quantized_norm1"
   top: "conv2"
   param {
@@ -176,7 +173,7 @@ layer {
     lr_mult: 2
     decay_mult: 0
   }
-  quan_convolution_param {
+  convolution_param {
     num_output: 256
     pad: 2
     kernel_size: 5
@@ -200,7 +197,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: -647.61907959
     range: 492.231109619
   }
@@ -219,7 +216,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: 1
     range: 492.231109619
   }
@@ -243,7 +240,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: 1
     range: 492.231109619
   }
@@ -267,14 +264,14 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: 1
     range: 138.726364136
   }
 }
 layer {
   name: "conv3"
-  type: "QuanConvolution"
+  type: "Convolution"
   bottom: "quantized_norm2"
   top: "conv3"
   param {
@@ -285,7 +282,7 @@ layer {
     lr_mult: 2
     decay_mult: 0
   }
-  quan_convolution_param {
+  convolution_param {
     num_output: 384
     pad: 1
     kernel_size: 3
@@ -309,7 +306,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: -389.565155029
     range: 331.981781006
   }
@@ -328,14 +325,14 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: 1
     range: 331.981781006
   }
 }
 layer {
   name: "conv4"
-  type: "QuanConvolution"
+  type: "Convolution"
   bottom: "quantized_relu3"
   top: "conv4"
   param {
@@ -346,7 +343,7 @@ layer {
     lr_mult: 2
     decay_mult: 0
   }
-  quan_convolution_param {
+  convolution_param {
     num_output: 384
     pad: 1
     kernel_size: 3
@@ -370,7 +367,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: -231.205978394
     range: 283.871887207
   }
@@ -389,14 +386,14 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: 1
     range: 283.871887207
   }
 }
 layer {
   name: "conv5"
-  type: "QuanConvolution"
+  type: "Convolution"
   bottom: "quantized_relu4"
   top: "conv5"
   param {
@@ -407,7 +404,7 @@ layer {
     lr_mult: 2
     decay_mult: 0
   }
-  quan_convolution_param {
+  convolution_param {
     num_output: 256
     pad: 1
     kernel_size: 3
@@ -431,7 +428,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: -172.605667114
     range: 272.573150635
   }
@@ -450,7 +447,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: 1
     range: 272.573150635
   }
@@ -474,7 +471,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: 1
     range: 272.573150635
   }
@@ -512,7 +509,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: -114.024871826
     range: 58.5417327881
   }
@@ -531,7 +528,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: 1
     range: 58.5417327881
   }
@@ -569,7 +566,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: -26.0193347931
     range: 19.1252574921
   }
@@ -588,7 +585,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: 1
     range: 19.1252574921
   }
@@ -618,7 +615,7 @@ layer {
   quantization_param {
     round_method: FLOOR
     round_strategy: AGGRESSIVE
-    bit_width: 8
+    bit_width: 4
     range: -9.84978103638
     range: 45.6884460449
   }

@@ -9,14 +9,13 @@
 namespace caffe {
 
   template <typename Dtype>
-  void Weight_Quantization(Dtype& weights, Dtype range_low_, Dtype range_high_)
+void QuanConvolutionLayer<Dtype>::Weight_Quantization(Dtype& weights)
   {
-    // you can select certain value for "bit_width_".
-    double bit_width_ = 4;
-
     Dtype scaling_factor = 0;
     Dtype min_value = 0;
     Dtype max_value = 0;
+
+    /******************************************/
 
     // smart choosing between 2s complement encoding or unsigned encoding
     if (range_low_ >= 0.0) {
@@ -41,10 +40,44 @@ namespace caffe {
       std::numeric_limits<Dtype>::infinity();
     Dtype pos_scaling_factor = (range_high_ > 0) ? log2(max_value/range_high_) :
       std::numeric_limits<Dtype>::infinity();
-    scaling_factor = pow((Dtype)2.0, round(std::min(neg_scaling_factor, pos_scaling_factor)));
+    
+    switch (round_strategy_)
+      {
+      case QuanInnerProductParameter_RoundStrategy_CONSERVATIVE:
+	scaling_factor = pow(2.0, floor(std::min(neg_scaling_factor, pos_scaling_factor)));
+	break;
+      case QuanInnerProductParameter_RoundStrategy_NEUTRAL:
+	scaling_factor = pow(2.0, round(std::min(neg_scaling_factor, pos_scaling_factor)));
+	break;
+      case QuanInnerProductParameter_RoundStrategy_AGGRESSIVE:
+	scaling_factor = pow(2.0, ceil(std::min(neg_scaling_factor, pos_scaling_factor)));
+	break;
+      default:
+	LOG(FATAL) << "Unknown round strategy.";
+      }
+    /******************************************/
 
+    Dtype weight_rounded;
+    switch (round_method_) 
+      {
+      case QuanInnerProductParameter_RoundMethod_ROUND:
+	weight_rounded = round(weights * (Dtype)scaling_factor);
+	break;
+      case QuanInnerProductParameter_RoundMethod_FLOOR:
+	weight_rounded = floor(weights * (Dtype)scaling_factor);
+	break;
+      case QuanInnerProductParameter_RoundMethod_CEIL:
+	weight_rounded = ceil(weights * (Dtype)scaling_factor);
+	break;
+      case QuanInnerProductParameter_RoundMethod_TRUNC:
+	weight_rounded = trunc(weights * (Dtype)scaling_factor);
+	break;
+      default:
+	LOG(FATAL) << "Unknown round method.";
+      }
+    
+    weight_rounded = floor(weights * (Dtype)scaling_factor);
     // y = clip(x, min, max) / scaling_factor; so y in [min/scaling_factor, max/scaling_factor]
-    Dtype weight_rounded = round(weights * scaling_factor);
     weights = std::min(std::max((Dtype)weight_rounded, (Dtype)(min_value)), (Dtype)(max_value)) /
       (Dtype)(scaling_factor);
   }
@@ -69,43 +102,59 @@ namespace caffe {
   }
 
   template <typename Dtype>
+  void QuanConvolutionLayer<Dtype>::get_quantization_paramter() 
+  {
+    bit_width_ = this->layer_param_.quan_convolution_param().bit_width();
+    // CHECK_GT(bit_width_, 0) << type() << " Layer has unexpected negative bit width";
+
+    round_method_ = this->layer_param_.quan_convolution_param().round_method();
+    //    round_method_ = this->round_method_;
+    round_strategy_ = this->layer_param_.quan_convolution_param().round_strategy();
+
+    // read range
+    range_low_ = this->layer_param_.quan_convolution_param().range_low();
+    range_high_ = this->layer_param_.quan_convolution_param().range_high();
+    //   std::cout << "+++++++++++++++++get:" << "round_method=" <<round_method_ << ";  bit_width=" << bit_width_ <<std::endl;
+  }
+
+  template <typename Dtype>
   void QuanConvolutionLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 						const vector<Blob<Dtype>*>& top) {
-    /**************************************/
-    Dtype* tmp_weight = (Dtype*) malloc((this->blobs_[0]->count())*sizeof(Dtype));
-    caffe_copy(this->blobs_[0]->count(), this->blobs_[0]->cpu_data(), tmp_weight);
+  /***********************get range*************************/
+  //  LOG(INFO) << "range_high_ =" << range_high_ << ";range_low_ =" << range_low_;
+  Dtype* tmp_weight = (Dtype*) malloc((this->blobs_[0]->count())*sizeof(Dtype));
+  caffe_copy(this->blobs_[0]->count(), this->blobs_[0]->cpu_data(), tmp_weight);
+  Dtype* Q_weight = const_cast<Dtype*>(tmp_weight);
+  ///// get range_high_ and range_low_.
+  // LOG(INFO) << "+++range_high_ =" << range_high_ << ";++++range_low_ =" << range_low_;
+  if((range_high_ ==  1) && (range_low_ ==  1))
+    {
+      Dtype* sort_weight = tmp_weight;
+      int qcount_ = this->blobs_[0]->count();
+      std::sort(sort_weight, sort_weight+(this->blobs_[0]->count()));
+      range_high_ = sort_weight[qcount_-1];
+      range_low_ = sort_weight[0];
+    }
+   LOG(INFO) << "range_high_ =" << range_high_ << ";range_low_ =" << range_low_;
 
-    Dtype* sort_weight = tmp_weight;
-    int qcount_ = this->blobs_[0]->count();
-    std::sort(sort_weight, sort_weight+(this->blobs_[0]->count()));
-    Dtype range_high_ = sort_weight[qcount_-1];
-    Dtype range_low_ = sort_weight[0];
-    /*
-      for (int i = 0; i < 1; ++i)
-      { 
-      std::cout << "old--cpu_data" << this->blobs_[0]->cpu_data()[i] << std::endl;
-      //	std::cout << "tmp_weight" << tmp_weight[i] << std::endl;
-      }
-    */
-
-    Dtype* Q_weight = const_cast<Dtype*>(tmp_weight);
+   std::cout << "test:" << "round_method=" << round_method_ << ";  bit_width=" << bit_width_ <<std::endl;
     for (int i = 0; i < (this->blobs_[0]->count()); ++i) 
       {
-	Weight_Quantization(*Q_weight, range_low_, range_high_);
+	Weight_Quantization(*(Q_weight+i));
       }
     const Dtype *weight = Q_weight;
-    for (int i = 0; i < 1; ++i) 
-      {
-	std::cout << "max:" << range_high_ << "  " << "min:" << range_low_ << std::endl;
-	std::cout << "new--cpu_data" << this->blobs_[0]->cpu_data()[i] << std::endl;
-      }
+
+    // for (int i = 0; i < 1; ++i) 
+    //   {
+    // 	std::cout << "new--cpu_data" << this->blobs_[0]->cpu_data()[i] << std::endl;
+    //   }
  
     /**************************************/
     // const Dtype* weight = this->blobs_[0]->cpu_data();
 
     //print weight to scence
-    for (int i = 0; i < 1; ++i) 
-      std::cout << "comput--weight" << weight[i] << std::endl;
+    // for (int i = 0; i < 1; ++i) 
+    //   std::cout << "comput--weight" << weight[i] << std::endl;
 
     for (int i = 0; i < bottom.size(); ++i) {
       const Dtype* bottom_data = bottom[i]->cpu_data();

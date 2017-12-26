@@ -7,16 +7,16 @@
 #include "caffe/layer.hpp"
 #include "caffe/proto/caffe.pb.h"
 
-#include "caffe/layers/base_conv_layer.hpp"
+#include "caffe/layers/base_quan_conv_layer.hpp"
 
 namespace caffe {
 
 template <typename Dtype>
-class QuanConvolutionLayer : public BaseConvolutionLayer<Dtype> {
+class QuanConvolutionLayer : public BaseQuanConvolutionLayer<Dtype> {
  public:
 
   explicit QuanConvolutionLayer(const LayerParameter& param)
-      : BaseConvolutionLayer<Dtype>(param) {}
+      : BaseQuanConvolutionLayer<Dtype>(param) {}
 
   virtual inline const char* type() const { return "QuanConvolutionLayer"; }
 
@@ -31,6 +31,15 @@ class QuanConvolutionLayer : public BaseConvolutionLayer<Dtype> {
   //     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
   virtual inline bool reverse_dimensions() { return false; }
   virtual void compute_output_shape();
+
+  /////////////////////////////////////////////////////////////
+  int bit_width_;
+  float range_low_, range_high_;
+  QuanConvolutionParameter_RoundMethod round_method_;
+  QuanConvolutionParameter_RoundStrategy round_strategy_;
+  virtual void get_quantization_paramter();
+  void Weight_Quantization(Dtype& weights);
+
 };
 
 }  // namespace caffe

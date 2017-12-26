@@ -53,7 +53,7 @@ layer {
 }
 layer {
   name: "conv1"
-  type: "QuanConvolution"
+  type: "Convolution"
   bottom: "quantized_data"
   top: "conv1"
   param {
@@ -64,7 +64,7 @@ layer {
     lr_mult: 2
     decay_mult: 0
   }
-  quan_convolution_param {
+  convolution_param {
     num_output: 96
     pad: 0
     kernel_size: 11
@@ -78,9 +78,6 @@ layer {
       type: "constant"
       std: 0.10000000149
     }
-    bit_width: 5
-    range_high: 0.402661
-    range_low: -0.373572
   }
 }
 layer {
@@ -165,7 +162,7 @@ layer {
 }
 layer {
   name: "conv2"
-  type: "QuanConvolution"
+  type: "Convolution"
   bottom: "quantized_norm1"
   top: "conv2"
   param {
@@ -176,7 +173,7 @@ layer {
     lr_mult: 2
     decay_mult: 0
   }
-  quan_convolution_param {
+  convolution_param {
     num_output: 256
     pad: 2
     kernel_size: 5
@@ -274,7 +271,7 @@ layer {
 }
 layer {
   name: "conv3"
-  type: "QuanConvolution"
+  type: "Convolution"
   bottom: "quantized_norm2"
   top: "conv3"
   param {
@@ -285,7 +282,7 @@ layer {
     lr_mult: 2
     decay_mult: 0
   }
-  quan_convolution_param {
+  convolution_param {
     num_output: 384
     pad: 1
     kernel_size: 3
@@ -335,7 +332,7 @@ layer {
 }
 layer {
   name: "conv4"
-  type: "QuanConvolution"
+  type: "Convolution"
   bottom: "quantized_relu3"
   top: "conv4"
   param {
@@ -346,7 +343,7 @@ layer {
     lr_mult: 2
     decay_mult: 0
   }
-  quan_convolution_param {
+  convolution_param {
     num_output: 384
     pad: 1
     kernel_size: 3
@@ -396,7 +393,7 @@ layer {
 }
 layer {
   name: "conv5"
-  type: "QuanConvolution"
+  type: "Convolution"
   bottom: "quantized_relu4"
   top: "conv5"
   param {
@@ -407,7 +404,7 @@ layer {
     lr_mult: 2
     decay_mult: 0
   }
-  quan_convolution_param {
+  convolution_param {
     num_output: 256
     pad: 1
     kernel_size: 3
