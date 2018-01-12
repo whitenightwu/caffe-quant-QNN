@@ -33,20 +33,55 @@ void QuantizationLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 	Dtype* top_data = top[0]->mutable_cpu_data();
 	const int count = bottom[0]->count();
 
-	// analyze the scaling factor, accompanied with min/max range of data
-	double scaling_factor, min_value, max_value;
-	analyze_scaling_factor(scaling_factor, min_value, max_value);
 
-	// apply quantization element-wise
-	for (int i = 0; i < count; ++i) {
-		top_data[i] = fixed_point(bottom_data[i], scaling_factor,
-				min_value, max_value);
-		// if(i < 1)
-		//   {
-		//     std::cout << "bottom_data" << i << "=" << bottom_data[i] << "  ;top_data" << i << "=" << top_data[i] << std::endl;
-		//   }
+	/***********************DoReFa-quantized*************************/
+	Dtype scaling_factor = pow((Dtype)2.0, (Dtype)bit_width_) - 1;
+
+	LOG(INFO) << "  scaling_factor=" << scaling_factor;
+	LOG(INFO) << bottom_data[0];
+
+	for (int i = 0; i < count; ++i) 
+	  {
+	    top_data[i] = activation_DoReFa_cpu(bottom_data[i], scaling_factor);
+	  }
+	LOG(INFO) << top_data[0];
+
+
+	/****************************QNN-quantization**************************/
+	// // analyze the scaling factor, accompanied with min/max range of data
+	// double scaling_factor, min_value, max_value;
+	// analyze_scaling_factor(scaling_factor, min_value, max_value);
+
+	// // apply quantization element-wise
+	// for (int i = 0; i < count; ++i) 
+	//   {
+	//     top_data[i] = fixed_point(bottom_data[i], scaling_factor, min_value, max_value);
+	//   }
+
+}
+
+template <typename Dtype>
+Dtype QuantizationLayer<Dtype>::activation_DoReFa_cpu(const Dtype& input_data, const double &scaling_factor) const{
+  double tmp_input_data = input_data;
+  tmp_input_data = std::max(std::min(tmp_input_data, 1.0), 0.0);
+	switch (round_method_) {
+	case QuantizationParameter_RoundMethod_ROUND:
+		return round((Dtype)tmp_input_data * (Dtype)scaling_factor) / scaling_factor;
+		break;
+	case QuantizationParameter_RoundMethod_FLOOR:
+		return floor((Dtype)tmp_input_data * (Dtype)scaling_factor) / scaling_factor;
+		break;
+	case QuantizationParameter_RoundMethod_CEIL:
+		return ceil((Dtype)tmp_input_data * (Dtype)scaling_factor) / scaling_factor;
+		break;
+	case QuantizationParameter_RoundMethod_TRUNC:
+		return trunc((Dtype)tmp_input_data * (Dtype)scaling_factor) / scaling_factor;
+		break;
+	default:
+		LOG(FATAL) << "Unknown round method.";
 	}
 }
+
 
 template <typename Dtype>
 void QuantizationLayer<Dtype>::analyze_scaling_factor(double& scaling_factor,
@@ -89,6 +124,7 @@ void QuantizationLayer<Dtype>::analyze_scaling_factor(double& scaling_factor,
 		LOG(FATAL) << "Unknown round strategy.";
 	}
 }
+
 
 template <typename Dtype>
 Dtype QuantizationLayer<Dtype>::fixed_point(const Dtype& input_data,

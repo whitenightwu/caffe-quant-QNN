@@ -36,13 +36,13 @@ __host__ void analyze_scaling_factor_gpu(Dtype& scaling_factor, Dtype& min_value
 
 	switch (round_strategy_) {
 	case QuantizationParameter_RoundStrategy_CONSERVATIVE:
-		scaling_factor = pow(Dtype(2.0), Dtype(floor(min(neg_scaling_factor, pos_scaling_factor)))) - 1;
+		scaling_factor = pow(Dtype(2.0), Dtype(floor(min(neg_scaling_factor, pos_scaling_factor))));
 		break;
 	case QuantizationParameter_RoundStrategy_NEUTRAL:
-		scaling_factor = pow(Dtype(2.0), Dtype(round(min(neg_scaling_factor, pos_scaling_factor)))) - 1;
+		scaling_factor = pow(Dtype(2.0), Dtype(round(min(neg_scaling_factor, pos_scaling_factor))));
 		break;
 	case QuantizationParameter_RoundStrategy_AGGRESSIVE:
-		scaling_factor = pow(Dtype(2.0), Dtype(ceil(min(neg_scaling_factor, pos_scaling_factor)))) -1;
+		scaling_factor = pow(Dtype(2.0), Dtype(ceil(min(neg_scaling_factor, pos_scaling_factor))));
 		break;
 	default:
 		LOG(FATAL) << "Unknown round strategy.";
@@ -74,18 +74,37 @@ __host__ void fixed_point_gpu(Dtype& weight_in, QuanConvolutionParameter_RoundMe
 	}
 
     weight_in = min(max((Dtype)weight_rounded, (Dtype)(min_value)), (Dtype)(max_value)) / (Dtype)(scaling_factor);
-
 }
 
 
-// template <typename Dtype>
-// __global__ void quan_tanh_norm(const int n, const Dtype* weight) {
-//   CUDA_KERNEL_LOOP(index, n) {
-//     weight[index] = tanh(fabs(weight[index]));
-//   }
-// }
+template <typename Dtype>
+__host__ void DoReFa_gpu(Dtype& weight_in, QuanConvolutionParameter_RoundMethod round_method_, const double &scaling_factor, const double &tanh_weight_max) {
+
+	weight_in = tanh(weight_in) / (Dtype)tanh_weight_max + (Dtype)0.5;
+
+	switch (round_method_) {
+	case QuantizationParameter_RoundMethod_ROUND:
+		weight_in = round(weight_in * (Dtype)scaling_factor) / scaling_factor;
+		break;
+	case QuantizationParameter_RoundMethod_FLOOR:
+		weight_in = floor(weight_in * (Dtype)scaling_factor) / scaling_factor;
+		break;
+	case QuantizationParameter_RoundMethod_CEIL:
+		weight_in = ceil(weight_in * (Dtype)scaling_factor) / scaling_factor;
+		break;
+	case QuantizationParameter_RoundMethod_TRUNC:
+		weight_in = trunc(weight_in * (Dtype)scaling_factor) / scaling_factor;
+		break;
+	default:
+		LOG(FATAL) << "Unknown round method.";
+	}
+}
 
 
+
+  /******************************************************************************/
+  /*******************************Forward_gpu************************************/
+  /******************************************************************************/
 
   template <typename Dtype>
   void QuanConvolutionLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
@@ -111,48 +130,68 @@ __host__ void fixed_point_gpu(Dtype& weight_in, QuanConvolutionParameter_RoundMe
 //   CUDA_POST_KERNEL_CHECK;
 // LOG(INFO) <<  Q_weight[0];
 
+  /***********************QNN-quantized*************************/
+//     Dtype scaling_factor =0;
+//     Dtype min_value=0 ;
+//     Dtype max_value=0;
 
-  /***********************quantized*************************/
-    // double scaling_factor;
-    // double min_value;
-    // double max_value;
-    Dtype scaling_factor =0;
-    Dtype min_value=0 ;
-    Dtype max_value=0;
-
-//LOG(INFO) << "bit_width=" << bit_width_ << ";  round_method=" << round_method_ << ";  round_strategy=" << round_strategy_ << ";  is_runtime=" << is_runtime_ << ";  range_low=" << range_low_ << ";  range_high=" << range_high_ ;
+// //LOG(INFO) << "bit_width=" << bit_width_ << ";  round_method=" << round_method_ << ";  round_strategy=" << round_strategy_ << ";  is_runtime=" << is_runtime_ << ";  range_low=" << range_low_ << ";  range_high=" << range_high_ ;
 
 
-    analyze_scaling_factor_gpu(scaling_factor, min_value, max_value, bit_width_, range_low_,range_high_, round_strategy_);
-//    analyze_scaling_factor_gpu(scaling_factor, min_value, max_value);
+//     analyze_scaling_factor_gpu(scaling_factor, min_value, max_value, bit_width_, range_low_,range_high_, round_strategy_);
+// //    analyze_scaling_factor_gpu(scaling_factor, min_value, max_value);
 
-//LOG(INFO) << " scaling_factor" << scaling_factor << " min_value" << min_value << "   max_value" << max_value;
+// //LOG(INFO) << " scaling_factor" << scaling_factor << " min_value" << min_value << "   max_value" << max_value;
 
 
-//Dtype *weight = NULL;
-int cnt = this->blobs_[0]->count();
-//LOG(INFO) << "count====" << this->blobs_[0]->count();
+// //Dtype *weight = NULL;
+// int cnt = this->blobs_[0]->count();
+// //LOG(INFO) << "count====" << this->blobs_[0]->count();
 
-    for (int i = 0; i < (this->blobs_[0]->count()); ++i) 
-      {
-	fixed_point_gpu( *(Q_weight+i),  round_method_,  scaling_factor, min_value, max_value);
-      }
-//fixed_point_gpu<<<CAFFE_GET_BLOCKS(cnt), CAFFE_CUDA_NUM_THREADS>>>(cnt, Q_weight,  round_method_,  scaling_factor, min_value, max_value, weight);
+//     for (int i = 0; i < (this->blobs_[0]->count()); ++i) 
+//       {
+// 	fixed_point_gpu( *(Q_weight+i),  round_method_,  scaling_factor, min_value, max_value);
+//       }
+// //fixed_point_gpu<<<CAFFE_GET_BLOCKS(cnt), CAFFE_CUDA_NUM_THREADS>>>(cnt, Q_weight,  round_method_,  scaling_factor, min_value, max_value, weight);
 
 
 
 
+// const Dtype *in_weight = Q_weight;
+// Dtype *A_weight;
+// cudaMalloc((void**)&A_weight, this->blobs_[0]->count() * sizeof(Dtype));
+// caffe_gpu_memcpy(this->blobs_[0]->count() * sizeof(Dtype), in_weight, A_weight);
+// const Dtype *weight = A_weight;
+// //LOG(INFO) << A_weight[0] << "++++A_weight" << A_weight[1];
+
+  /***********************DoReFa-quantized*************************/
+
+
+
+ Dtype weight_max = max(-range_low_, range_high_);
+ Dtype tanh_weight_max = 2 * tanh(weight_max);
+  // Dtype weight_max = range_high_ - range_low_;
+  // Dtype tanh_weight_max = tanh(weight_max);
+  Dtype scaling_factor = pow((Dtype)2.0, (Dtype)bit_width_) - 1;
+
+LOG(INFO) << "tanh_weight_max=" << tanh_weight_max << "  weight_max=" << weight_max  << "  scaling_factor=" << scaling_factor;
+LOG(INFO) << Q_weight[0];
+
+  for (int i = 0; i < (this->blobs_[0]->count()); ++i) 
+  {
+    DoReFa_gpu( *(Q_weight+i),  round_method_,  scaling_factor, tanh_weight_max);
+  }
+LOG(INFO) << Q_weight[0];
 const Dtype *in_weight = Q_weight;
 Dtype *A_weight;
 cudaMalloc((void**)&A_weight, this->blobs_[0]->count() * sizeof(Dtype));
 caffe_gpu_memcpy(this->blobs_[0]->count() * sizeof(Dtype), in_weight, A_weight);
 const Dtype *weight = A_weight;
-//LOG(INFO) << A_weight[0] << "++++A_weight" << A_weight[1];
 
 
 
 
-    /**************************************/
+  /***********************compute*************************/
     for (int i = 0; i < bottom.size(); ++i) {
       const Dtype* bottom_data = bottom[i]->gpu_data();
       Dtype* top_data = top[i]->mutable_gpu_data();

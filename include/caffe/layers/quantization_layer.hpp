@@ -96,6 +96,9 @@ private:
 	void analyze_scaling_factor(double& scaling_factor, double& min_value,
 			double& max_value) const;
 
+  Dtype activation_DoReFa_cpu(const Dtype& input_data, const double &scaling_factor) const;
+
+
   /////////GPU
 	// Dtype fixed_point_gpu(const Dtype& input_data, const double& scaling_factor,
 	// 		const double& min_value, const double& max_value) const;
