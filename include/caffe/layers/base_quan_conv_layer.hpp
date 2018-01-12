@@ -94,10 +94,10 @@ class BaseQuanConvolutionLayer : public Layer<Dtype> {
   bool is_1x1_;
   bool force_nd_im2col_;
   /////////////////////////////////////////////////////////////
-  int bit_width_;	
-  float range_low_, range_high_;
-  QuanConvolutionParameter_RoundMethod round_method_;
-  QuanConvolutionParameter_RoundStrategy round_strategy_;
+  // int bit_width_;	
+  // float range_low_, range_high_;
+  // QuanConvolutionParameter_RoundMethod round_method_;
+  // QuanConvolutionParameter_RoundStrategy round_strategy_;
 
 
  private:

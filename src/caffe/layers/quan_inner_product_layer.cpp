@@ -70,6 +70,14 @@ void QuanInnerProductLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom
   // read range
   range_low_ = this->layer_param_.quan_inner_product_param().range_low();
   range_high_ = this->layer_param_.quan_inner_product_param().range_high();
+  is_runtime_ = this->layer_param_.quan_inner_product_param().is_runtime();
+
+  if(range_low_ == range_high_ )
+    is_runtime_ = 1;
+
+    std::cout << "ydwu=======get:" << std::endl;
+    std::cout << "bit_width=" << bit_width_ << ";  round_method=" << round_method_ << ";  round_strategy=" << round_strategy_ << ";  is_runtime=" << is_runtime_ << ";  range_low=" << range_low_ << ";  range_high=" << range_high_ << std::endl;
+
 }
 
 template <typename Dtype>
@@ -124,7 +132,7 @@ void QuanInnerProductLayer<Dtype>::Weight_Quantization(Dtype& weights)
     }
 
     // analyze the scaling factor based on min(max)value and range
-    // scaling factor should be power of 2
+    // "scaling factor" should be power of 2
     // example:  scaling_factor = 2^(round(X)); X = log2(min_value / range_low), in [0,1]
     Dtype neg_scaling_factor = (range_low_ < 0) ? log2(min_value/range_low_) :
       std::numeric_limits<Dtype>::infinity();
@@ -168,7 +176,7 @@ void QuanInnerProductLayer<Dtype>::Weight_Quantization(Dtype& weights)
       }
     
     weight_rounded = floor(weights * (Dtype)scaling_factor);
-    // y = clip(x, min, max) / scaling_factor; so y in [min/scaling_factor, max/scaling_factor]
+    // y = clip(x, min, max) / scaling_factor; so y in [min_value /scaling_factor, max_value/scaling_factor]
     weights = std::min(std::max((Dtype)weight_rounded, (Dtype)(min_value)), (Dtype)(max_value)) /
       (Dtype)(scaling_factor);
   }
@@ -265,7 +273,7 @@ void QuanInnerProductLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
   caffe_copy(this->blobs_[0]->count(), this->blobs_[0]->cpu_data(), tmp_weight);
   Dtype* Q_weight = const_cast<Dtype*>(tmp_weight);
   // get range_high_ and range_low_.
-  if(range_high_ == range_low_ )
+  if(is_runtime_)
     {
       Dtype* sort_weight = tmp_weight;
       int qcount_ = this->blobs_[0]->count();
@@ -273,7 +281,7 @@ void QuanInnerProductLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
       range_high_ = sort_weight[qcount_-1];
       range_low_ = sort_weight[0];
     }
-   LOG(INFO) << "range_high_ =" << range_high_ << ";range_low_ =" << range_low_;
+  //   LOG(INFO) << "range_high_ =" << range_high_ << ";range_low_ =" << range_low_;
 
 
   /***********************quantized*************************/
@@ -312,6 +320,7 @@ void QuanInnerProductLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& botto
         bias_multiplier_.cpu_data(),
         this->blobs_[1]->cpu_data(), (Dtype)1., top_data);
   }
+  free(tmp_weight);
 }
 
 template <typename Dtype>
