@@ -35,28 +35,28 @@ void QuantizationLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 
 
 	/***********************DoReFa-quantized*************************/
-	Dtype scaling_factor = pow((Dtype)2.0, (Dtype)bit_width_) - 1;
+	// Dtype scaling_factor = pow((Dtype)2.0, (Dtype)bit_width_) - 1;
 
-	LOG(INFO) << "  scaling_factor=" << scaling_factor;
-	LOG(INFO) << bottom_data[0];
+	// LOG(INFO) << "  scaling_factor=" << scaling_factor;
+	// LOG(INFO) << bottom_data[0];
 
-	for (int i = 0; i < count; ++i) 
-	  {
-	    top_data[i] = activation_DoReFa_cpu(bottom_data[i], scaling_factor);
-	  }
-	LOG(INFO) << top_data[0];
+	// for (int i = 0; i < count; ++i) 
+	//   {
+	//     top_data[i] = activation_DoReFa_cpu(bottom_data[i], scaling_factor);
+	//   }
+	// LOG(INFO) << top_data[0];
 
 
 	/****************************QNN-quantization**************************/
-	// // analyze the scaling factor, accompanied with min/max range of data
-	// double scaling_factor, min_value, max_value;
-	// analyze_scaling_factor(scaling_factor, min_value, max_value);
+	// analyze the scaling factor, accompanied with min/max range of data
+	double scaling_factor, min_value, max_value;
+	analyze_scaling_factor(scaling_factor, min_value, max_value);
 
-	// // apply quantization element-wise
-	// for (int i = 0; i < count; ++i) 
-	//   {
-	//     top_data[i] = fixed_point(bottom_data[i], scaling_factor, min_value, max_value);
-	//   }
+	// apply quantization element-wise
+	for (int i = 0; i < count; ++i) 
+	  {
+	    top_data[i] = fixed_point(bottom_data[i], scaling_factor, min_value, max_value);
+	  }
 
 }
 
