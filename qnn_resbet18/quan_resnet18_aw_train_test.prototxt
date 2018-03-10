@@ -1,0 +1,1524 @@
+name: "ResNet-18"
+layer {
+  name: "data"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TRAIN
+  }
+  transform_param {
+    mirror: true
+    crop_size: 224
+    mean_file: "/mllib/imagenet/ilsvrc12/imagenet_mean.binaryproto"
+  }
+  data_param {
+    source:"/mllib/imagenet/ilsvrc12/lmdb_resize/ilsvrc12_train_lmdb"
+    batch_size: 50
+    backend: LMDB
+  }
+}
+layer {
+  name: "data"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    mirror: false
+    crop_size: 224
+    mean_file: "/mllib/imagenet/ilsvrc12/imagenet_mean.binaryproto"
+  }
+  data_param {
+    source:"/mllib/imagenet/ilsvrc12/lmdb_resize/ilsvrc12_val_lmdb"
+    batch_size: 50
+    backend: LMDB
+  }
+}
+
+
+layer {
+  bottom: "data"
+  top: "conv1"
+  name: "conv1"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 64
+    kernel_size: 7
+    pad: 3
+    stride: 2
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 1.610385
+    range_low: -1.962863
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "conv1"
+  top: "conv1"
+  name: "bn_conv1"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "conv1"
+  top: "conv1"
+  name: "scale_conv1"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  bottom: "conv1"
+  top: "conv1"
+  name: "conv1_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_conv1"
+  type: "Quantization"
+  bottom: "conv1"
+  top: "quantized_conv1"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 20.756613
+  }
+}
+
+
+layer {
+  bottom: "quantized_conv1"
+  top: "pool1"
+  name: "pool1"
+  type: "Pooling"
+  pooling_param {
+    kernel_size: 3
+    stride: 2
+    pool: MAX
+  }
+}
+##########################
+######first shortcut######
+##########################
+layer {
+  bottom: "pool1"
+  top: "res2a_branch1"
+  name: "res2a_branch1"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 64
+    kernel_size: 1
+    pad: 0
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.912394
+    range_low: -1.313164
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res2a_branch1"
+  top: "res2a_branch1"
+  name: "bn2a_branch1"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res2a_branch1"
+  top: "res2a_branch1"
+  name: "scale2a_branch1"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "quantized_res2a_branch1"
+  type: "Quantization"
+  bottom: "res2a_branch1"
+  top: "res2a_branch1"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -17.400530 
+    range: 10.660799
+  }
+}
+
+layer {
+  bottom: "pool1"
+  top: "res2a_branch2a"
+  name: "res2a_branch2a"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.766093
+    range_low: -0.775398 
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res2a_branch2a"
+  top: "res2a_branch2a"
+  name: "bn2a_branch2a"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res2a_branch2a"
+  top: "res2a_branch2a"
+  name: "scale2a_branch2a"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  bottom: "res2a_branch2a"
+  top: "res2a_branch2a"
+  name: "res2a_branch2a_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res2a_branch2a"
+  type: "Quantization"
+  bottom: "res2a_branch2a"
+  top: "res2a_branch2a"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 8.823804
+  }
+}
+
+
+layer {
+  bottom: "res2a_branch2a"
+  top: "res2a_branch2b"
+  name: "res2a_branch2b"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.540852
+    range_low: -0.655141
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res2a_branch2b"
+  top: "res2a_branch2b"
+  name: "bn2a_branch2b"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res2a_branch2b"
+  top: "res2a_branch2b"
+  name: "scale2a_branch2b"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "quantized_res2a_branch2b"
+  type: "Quantization"
+  bottom: "res2a_branch2b"
+  top: "res2a_branch2b"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -11.454288 
+    range: 7.041914
+  }
+}
+
+layer {
+  bottom: "res2a_branch1"
+  bottom: "res2a_branch2b"
+  top: "res2a"
+  name: "res2a"
+  type: "Eltwise"
+  eltwise_param {
+    operation: SUM
+  }
+}
+
+layer {
+  bottom: "res2a"
+  top: "res2a"
+  name: "res2a_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res2a"
+  type: "Quantization"
+  bottom: "res2a"
+  top: "res2a"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 13.009123
+  }
+}
+
+layer {
+  bottom: "res2a"
+  top: "res2b_branch2a"
+  name: "res2b_branch2a"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.564910
+    range_low: -0.568788
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res2b_branch2a"
+  top: "res2b_branch2a"
+  name: "bn2b_branch2a"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res2b_branch2a"
+  top: "res2b_branch2a"
+  name: "scale2b_branch2a"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  bottom: "res2b_branch2a"
+  top: "res2b_branch2a"
+  name: "res2b_branch2a_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res2b_branch2a"
+  type: "Quantization"
+  bottom: "res2b_branch2a"
+  top: "res2b_branch2a"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 8.880712
+  }
+}
+
+layer {
+  bottom: "res2b_branch2a"
+  top: "res2b_branch2b"
+  name: "res2b_branch2b"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 64
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.687465
+    range_low: -0.622088
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res2b_branch2b"
+  top: "res2b_branch2b"
+  name: "bn2b_branch2b"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res2b_branch2b"
+  top: "res2b_branch2b"
+  name: "scale2b_branch2b"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "quantized_res2b_branch2b"
+  type: "Quantization"
+  bottom: "res2b_branch2b"
+  top: "res2b_branch2b"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -9.797962 
+    range: 9.198802
+  }
+}
+
+
+layer {
+  bottom: "res2a"
+  bottom: "res2b_branch2b"
+  top: "res2b"
+  name: "res2b"
+  type: "Eltwise"
+  eltwise_param {
+    operation: SUM
+  }
+}
+
+layer {
+  bottom: "res2b"
+  top: "res2b"
+  name: "res2b_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res2b"
+  type: "Quantization"
+  bottom: "res2b"
+  top: "res2b"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 16.731560
+  }
+}
+
+
+##########################
+######second shortcut#####
+##########################
+
+layer {
+  bottom: "res2b"
+  top: "res3a_branch1"
+  name: "res3a_branch1"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 128
+    kernel_size: 1
+    pad: 0
+    stride: 2
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 1.011977
+    range_low: -1.006775
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res3a_branch1"
+  top: "res3a_branch1"
+  name: "bn3a_branch1"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res3a_branch1"
+  top: "res3a_branch1"
+  name: "scale3a_branch1"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "quantized_res3a_branch1"
+  type: "Quantization"
+  bottom: "res3a_branch1"
+  top: "res3a_branch1"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -7.569409 
+    range: 13.997952
+  }
+}
+
+
+layer {
+  bottom: "res2b"
+  top: "res3a_branch2a"
+  name: "res3a_branch2a"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 2
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.490194
+    range_low: -0.580899
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res3a_branch2a"
+  top: "res3a_branch2a"
+  name: "bn3a_branch2a"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res3a_branch2a"
+  top: "res3a_branch2a"
+  name: "scale3a_branch2a"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  bottom: "res3a_branch2a"
+  top: "res3a_branch2a"
+  name: "res3a_branch2a_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res3a_branch2a"
+  type: "Quantization"
+  bottom: "res3a_branch2a"
+  top: "res3a_branch2a"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 7.243767
+  }
+}
+
+layer {
+  bottom: "res3a_branch2a"
+  top: "res3a_branch2b"
+  name: "res3a_branch2b"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.902467
+    range_low: -0.573389
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res3a_branch2b"
+  top: "res3a_branch2b"
+  name: "bn3a_branch2b"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res3a_branch2b"
+  top: "res3a_branch2b"
+  name: "scale3a_branch2b"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "quantized_res3a_branch2b"
+  type: "Quantization"
+  bottom: "res3a_branch2b"
+  top: "res3a_branch2b"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -8.208627 
+    range: 13.289404
+  }
+}
+
+layer {
+  bottom: "res3a_branch1"
+  bottom: "res3a_branch2b"
+  top: "res3a"
+  name: "res3a"
+  type: "Eltwise"
+  eltwise_param {
+    operation: SUM
+  }
+}
+
+layer {
+  bottom: "res3a"
+  top: "res3a"
+  name: "res3a_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res3a"
+  type: "Quantization"
+  bottom: "res3a"
+  top: "res3a"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 16.047813
+  }
+}
+
+layer {
+  bottom: "res3a"
+  top: "res3b_branch2a"
+  name: "res3b_branch2a"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.889211
+    range_low: -0.708082
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res3b_branch2a"
+  top: "res3b_branch2a"
+  name: "bn3b_branch2a"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res3b_branch2a"
+  top: "res3b_branch2a"
+  name: "scale3b_branch2a"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  bottom: "res3b_branch2a"
+  top: "res3b_branch2a"
+  name: "res3b_branch2a_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res3b_branch2a"
+  type: "Quantization"
+  bottom: "res3b_branch2a"
+  top: "res3b_branch2a"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 11.069953
+  }
+}
+
+layer {
+  bottom: "res3b_branch2a"
+  top: "res3b_branch2b"
+  name: "res3b_branch2b"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 128
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.581038
+    range_low: -0.514097
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res3b_branch2b"
+  top: "res3b_branch2b"
+  name: "bn3b_branch2b"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res3b_branch2b"
+  top: "res3b_branch2b"
+  name: "scale3b_branch2b"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "quantized_res3b_branch2b"
+  type: "Quantization"
+  bottom: "res3b_branch2b"
+  top: "res3b_branch2b"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -10.578491 
+    range: 9.741951
+  }
+}
+
+layer {
+  bottom: "res3a"
+  bottom: "res3b_branch2b"
+  top: "res3b"
+  name: "res3b"
+  type: "Eltwise"
+  eltwise_param {
+    operation: SUM
+  }
+}
+
+layer {
+  bottom: "res3b"
+  top: "res3b"
+  name: "res3b_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res3b"
+  type: "Quantization"
+  bottom: "res3b"
+  top: "res3b"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 21.433855
+  }
+}
+
+##########################
+######third shortcut#####
+##########################
+
+layer {
+  bottom: "res3b"
+  top: "res4a_branch1"
+  name: "res4a_branch1"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 256
+    kernel_size: 1
+    pad: 0
+    stride: 2
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.658020
+    range_low: -0.481130
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res4a_branch1"
+  top: "res4a_branch1"
+  name: "bn4a_branch1"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res4a_branch1"
+  top: "res4a_branch1"
+  name: "scale4a_branch1"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "quantized_res4a_branch1"
+  type: "Quantization"
+  bottom: "res4a_branch1"
+  top: "res4a_branch1"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -4.208524 
+    range: 6.280115
+  }
+}
+
+layer {
+  bottom: "res3b"
+  top: "res4a_branch2a"
+  name: "res4a_branch2a"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 256
+    kernel_size: 3
+    pad: 1
+    stride: 2
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.797406
+    range_low: -0.441803
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res4a_branch2a"
+  top: "res4a_branch2a"
+  name: "bn4a_branch2a"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res4a_branch2a"
+  top: "res4a_branch2a"
+  name: "scale4a_branch2a"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  bottom: "res4a_branch2a"
+  top: "res4a_branch2a"
+  name: "res4a_branch2a_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res4a_branch2a"
+  type: "Quantization"
+  bottom: "res4a_branch2a"
+  top: "res4a_branch2a"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 9.695500
+  }
+}
+
+layer {
+  bottom: "res4a_branch2a"
+  top: "res4a_branch2b"
+  name: "res4a_branch2b"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 256
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.719875
+    range_low: -0.495432
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res4a_branch2b"
+  top: "res4a_branch2b"
+  name: "bn4a_branch2b"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res4a_branch2b"
+  top: "res4a_branch2b"
+  name: "scale4a_branch2b"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "quantized_res4a_branch2b"
+  type: "Quantization"
+  bottom: "res4a_branch2b"
+  top: "res4a_branch2b"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -8.957634 
+    range: 14.615593
+  }
+}
+
+layer {
+  bottom: "res4a_branch1"
+  bottom: "res4a_branch2b"
+  top: "res4a"
+  name: "res4a"
+  type: "Eltwise"
+  eltwise_param {
+    operation: SUM
+  }
+}
+
+layer {
+  bottom: "res4a"
+  top: "res4a"
+  name: "res4a_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res4a"
+  type: "Quantization"
+  bottom: "res4a"
+  top: "res4a"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 17.200615
+  }
+}
+
+layer {
+  bottom: "res4a"
+  top: "res4b_branch2a"
+  name: "res4b_branch2a"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 256
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.524512
+    range_low: -0.445810
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res4b_branch2a"
+  top: "res4b_branch2a"
+  name: "bn4b_branch2a"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res4b_branch2a"
+  top: "res4b_branch2a"
+  name: "scale4b_branch2a"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  bottom: "res4b_branch2a"
+  top: "res4b_branch2a"
+  name: "res4b_branch2a_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res4b_branch2a"
+  type: "Quantization"
+  bottom: "res4b_branch2a"
+  top: "res4b_branch2a"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 8.027243
+  }
+}
+
+layer {
+  bottom: "res4b_branch2a"
+  top: "res4b_branch2b"
+  name: "res4b_branch2b"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 256
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.351175
+    range_low: -0.311174
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res4b_branch2b"
+  top: "res4b_branch2b"
+  name: "bn4b_branch2b"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res4b_branch2b"
+  top: "res4b_branch2b"
+  name: "scale4b_branch2b"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "quantized_res4b_branch2b"
+  type: "Quantization"
+  bottom: "res4b_branch2b"
+  top: "res4b_branch2b"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -11.837559 
+    range: 9.830373
+  }
+}
+
+layer {
+  bottom: "res4a"
+  bottom: "res4b_branch2b"
+  top: "res4b"
+  name: "res4b"
+  type: "Eltwise"
+  eltwise_param {
+    operation: SUM
+  }
+}
+
+layer {
+  bottom: "res4b"
+  top: "res4b"
+  name: "res4b_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res4b"
+  type: "Quantization"
+  bottom: "res4b"
+  top: "res4b"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 15.533745
+  }
+}
+
+##########################
+######forth shortcut#####
+##########################
+
+layer {
+  bottom: "res4b"
+  top: "res5a_branch1"
+  name: "res5a_branch1"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 512
+    kernel_size: 1
+    pad: 0
+    stride: 2
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.782129
+    range_low: -1.073258
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res5a_branch1"
+  top: "res5a_branch1"
+  name: "bn5a_branch1"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res5a_branch1"
+  top: "res5a_branch1"
+  name: "scale5a_branch1"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "quantized_res5a_branch1"
+  type: "Quantization"
+  bottom: "res5a_branch1"
+  top: "res5a_branch1"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -5.143247 
+    range: 7.278247
+  }
+}
+
+layer {
+  bottom: "res4b"
+  top: "res5a_branch2a"
+  name: "res5a_branch2a"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 512
+    kernel_size: 3
+    pad: 1
+    stride: 2
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.504284
+    range_low: -0.287673
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res5a_branch2a"
+  top: "res5a_branch2a"
+  name: "bn5a_branch2a"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res5a_branch2a"
+  top: "res5a_branch2a"
+  name: "scale5a_branch2a"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  bottom: "res5a_branch2a"
+  top: "res5a_branch2a"
+  name: "res5a_branch2a_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res5a_branch2a"
+  type: "Quantization"
+  bottom: "res5a_branch2a"
+  top: "res5a_branch2a"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 5.522599
+  }
+}
+
+layer {
+  bottom: "res5a_branch2a"
+  top: "res5a_branch2b"
+  name: "res5a_branch2b"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 512
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.454792
+    range_low: -0.273284
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res5a_branch2b"
+  top: "res5a_branch2b"
+  name: "bn5a_branch2b"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res5a_branch2b"
+  top: "res5a_branch2b"
+  name: "scale5a_branch2b"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "quantized_res5a_branch2b"
+  type: "Quantization"
+  bottom: "res5a_branch2b"
+  top: "res5a_branch2b"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -7.944686 
+    range: 12.387192
+  }
+}
+
+layer {
+  bottom: "res5a_branch1"
+  bottom: "res5a_branch2b"
+  top: "res5a"
+  name: "res5a"
+  type: "Eltwise"
+  eltwise_param {
+    operation: SUM
+  }
+}
+
+layer {
+  bottom: "res5a"
+  top: "res5a"
+  name: "res5a_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res5a"
+  type: "Quantization"
+  bottom: "res5a"
+  top: "res5a"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 14.911362
+  }
+}
+
+layer {
+  bottom: "res5a"
+  top: "res5b_branch2a"
+  name: "res5b_branch2a"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 512
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.411482
+    range_low: -0.334819
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res5b_branch2a"
+  top: "res5b_branch2a"
+  name: "bn5b_branch2a"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res5b_branch2a"
+  top: "res5b_branch2a"
+  name: "scale5b_branch2a"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  bottom: "res5b_branch2a"
+  top: "res5b_branch2a"
+  name: "res5b_branch2a_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res5b_branch2a"
+  type: "Quantization"
+  bottom: "res5b_branch2a"
+  top: "res5b_branch2a"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 9.014216
+  }
+}
+
+layer {
+  bottom: "res5b_branch2a"
+  top: "res5b_branch2b"
+  name: "res5b_branch2b"
+  type: "QuanConvolution"
+  quan_convolution_param {
+    num_output: 512
+    kernel_size: 3
+    pad: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+    bit_width: 8
+    range_high: 0.427561
+    range_low: -0.263203
+    bias_term: false
+  }
+}
+
+layer {
+  bottom: "res5b_branch2b"
+  top: "res5b_branch2b"
+  name: "bn5b_branch2b"
+  type: "BatchNorm"
+}
+
+layer {
+  bottom: "res5b_branch2b"
+  top: "res5b_branch2b"
+  name: "scale5b_branch2b"
+  type: "Scale"
+  scale_param {
+    bias_term: true
+  }
+}
+
+layer {
+  name: "quantized_res5b_branch2b"
+  type: "Quantization"
+  bottom: "res5b_branch2b"
+  top: "res5b_branch2b"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: -21.284969 
+    range: 33.256569
+  }
+}
+
+layer {
+  bottom: "res5a"
+  bottom: "res5b_branch2b"
+  top: "res5b"
+  name: "res5b"
+  type: "Eltwise"
+  eltwise_param {
+    operation: SUM
+  }
+}
+
+layer {
+  bottom: "res5b"
+  top: "res5b"
+  name: "res5b_relu"
+  type: "ReLU"
+}
+
+layer {
+  name: "quantized_res5b"
+  type: "Quantization"
+  bottom: "res5b"
+  top: "res5b"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0.0
+    range: 43.090839
+  }
+}
+
+layer {
+  bottom: "res5b"
+  top: "pool5"
+  name: "pool5"
+  type: "Pooling"
+  pooling_param {
+    kernel_size: 7
+    stride: 1
+    pool: AVE
+  }
+}
+
+layer {
+  bottom: "pool5"
+  top: "fc1000"
+  name: "fc1000"
+  type: "InnerProduct"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 1
+  }
+  inner_product_param {
+    num_output: 1000
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "loss"
+  type: "SoftmaxWithLoss"
+  bottom: "fc1000"
+  bottom: "label"
+  top: "loss"
+}
+
+layer {
+  name: "top1"
+  type: "Accuracy"
+  bottom: "fc1000"
+  bottom: "label"
+  top: "top1"
+}
+
+layer {
+  name: "top5"
+  type: "Accuracy"
+  bottom: "fc1000"
+  bottom: "label"
+  top: "top5"
+  accuracy_param{
+  top_k: 5
+  }
+}

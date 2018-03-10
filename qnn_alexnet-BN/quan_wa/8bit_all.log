@@ -1,0 +1,1781 @@
+I0110 19:07:04.572552 32604 caffe.cpp:275] Use GPU with device ID 1
+I0110 19:07:04.621701 32604 caffe.cpp:279] GPU device name: Graphics Device
+I0110 19:07:05.216022 32604 net.cpp:294] The NetState phase (1) differed from the phase (0) specified by a rule in layer data
+I0110 19:07:05.216132 32604 net.cpp:294] The NetState phase (1) differed from the phase (0) specified by a rule in layer accuracy_5_TRAIN
+I0110 19:07:05.216449 32604 net.cpp:51] Initializing net from parameters: 
+name: "AlexNet-BN"
+state {
+  phase: TEST
+  level: 0
+  stage: ""
+}
+layer {
+  name: "data"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    mirror: false
+    crop_size: 224
+    mean_value: 103.939
+    mean_value: 116.779
+    mean_value: 123.68
+  }
+  data_param {
+    source: "/home/ydwu/database/imagenet/ilsvrc12/lmdb_resize/ilsvrc12_val_lmdb"
+    batch_size: 200
+    backend: LMDB
+  }
+}
+layer {
+  name: "conv1"
+  type: "QuanConvolution"
+  bottom: "data"
+  top: "conv1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  quan_convolution_param {
+    num_output: 96
+    pad: 2
+    kernel_size: 11
+    stride: 4
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+    round_method: ROUND
+    round_strategy: NEUTRAL
+    bit_width: 8
+    range_low: -0.872089
+    range_high: 0.927025
+  }
+}
+layer {
+  name: "bn1"
+  type: "BatchNorm"
+  bottom: "conv1"
+  top: "conv1"
+}
+layer {
+  name: "scale1"
+  type: "Scale"
+  bottom: "conv1"
+  top: "conv1"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "relu1"
+  type: "ReLU"
+  bottom: "conv1"
+  top: "conv1"
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "quantized_conv1"
+  type: "Quantization"
+  bottom: "pool1"
+  top: "pool1"
+  quantization_param {
+    round_method: ROUND
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0
+    range: 13.965383
+  }
+}
+layer {
+  name: "conv2"
+  type: "QuanConvolution"
+  bottom: "pool1"
+  top: "conv2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  quan_convolution_param {
+    num_output: 256
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+    round_method: ROUND
+    round_strategy: NEUTRAL
+    bit_width: 8
+    range_low: -0.806018
+    range_high: 1.5182
+  }
+}
+layer {
+  name: "bn2"
+  type: "BatchNorm"
+  bottom: "conv2"
+  top: "conv2"
+}
+layer {
+  name: "scale2"
+  type: "Scale"
+  bottom: "conv2"
+  top: "conv2"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "relu2"
+  type: "ReLU"
+  bottom: "conv2"
+  top: "conv2"
+}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "conv2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "quantized_conv2"
+  type: "Quantization"
+  bottom: "pool2"
+  top: "pool2"
+  quantization_param {
+    round_method: ROUND
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0
+    range: 6.74956
+  }
+}
+layer {
+  name: "conv3"
+  type: "QuanConvolution"
+  bottom: "pool2"
+  top: "conv3"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  quan_convolution_param {
+    num_output: 384
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+    round_method: ROUND
+    round_strategy: NEUTRAL
+    bit_width: 8
+    range_low: -0.621858
+    range_high: 0.673858
+  }
+}
+layer {
+  name: "bn3"
+  type: "BatchNorm"
+  bottom: "conv3"
+  top: "conv3"
+}
+layer {
+  name: "scale3"
+  type: "Scale"
+  bottom: "conv3"
+  top: "conv3"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "relu3"
+  type: "ReLU"
+  bottom: "conv3"
+  top: "conv3"
+}
+layer {
+  name: "quantized_conv3"
+  type: "Quantization"
+  bottom: "conv3"
+  top: "conv3"
+  quantization_param {
+    round_method: ROUND
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0
+    range: 8.48454
+  }
+}
+layer {
+  name: "conv4"
+  type: "QuanConvolution"
+  bottom: "conv3"
+  top: "conv4"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  quan_convolution_param {
+    num_output: 384
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+    round_method: ROUND
+    round_strategy: NEUTRAL
+    bit_width: 8
+    range_low: -0.376634
+    range_high: 0.341829
+  }
+}
+layer {
+  name: "bn4"
+  type: "BatchNorm"
+  bottom: "conv4"
+  top: "conv4"
+}
+layer {
+  name: "scale4"
+  type: "Scale"
+  bottom: "conv4"
+  top: "conv4"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "relu4"
+  type: "ReLU"
+  bottom: "conv4"
+  top: "conv4"
+}
+layer {
+  name: "quantized_conv4"
+  type: "Quantization"
+  bottom: "conv4"
+  top: "conv4"
+  quantization_param {
+    round_method: ROUND
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0
+    range: 7.3369722
+  }
+}
+layer {
+  name: "conv5"
+  type: "QuanConvolution"
+  bottom: "conv4"
+  top: "conv5"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  quan_convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+    round_method: ROUND
+    round_strategy: NEUTRAL
+    bit_width: 8
+    range_low: -0.347658
+    range_high: 0.330042
+  }
+}
+layer {
+  name: "bn5"
+  type: "BatchNorm"
+  bottom: "conv5"
+  top: "conv5"
+}
+layer {
+  name: "scale5"
+  type: "Scale"
+  bottom: "conv5"
+  top: "conv5"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "relu5"
+  type: "ReLU"
+  bottom: "conv5"
+  top: "conv5"
+}
+layer {
+  name: "pool5"
+  type: "Pooling"
+  bottom: "conv5"
+  top: "pool5"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+  }
+}
+layer {
+  name: "quantized_conv5"
+  type: "Quantization"
+  bottom: "pool5"
+  top: "pool5"
+  quantization_param {
+    round_method: ROUND
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0
+    range: 8.7577133
+  }
+}
+layer {
+  name: "fc6"
+  type: "QuanInnerProduct"
+  bottom: "pool5"
+  top: "fc6"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  quan_inner_product_param {
+    num_output: 4096
+    weight_filler {
+      type: "gaussian"
+      std: 0.005
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+    round_method: ROUND
+    round_strategy: NEUTRAL
+    bit_width: 8
+    range_low: -0.160061
+    range_high: 0.148064
+  }
+}
+layer {
+  name: "bn6"
+  type: "BatchNorm"
+  bottom: "fc6"
+  top: "fc6"
+}
+layer {
+  name: "scale6"
+  type: "Scale"
+  bottom: "fc6"
+  top: "fc6"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "relu6"
+  type: "ReLU"
+  bottom: "fc6"
+  top: "fc6"
+}
+layer {
+  name: "drop6"
+  type: "Dropout"
+  bottom: "fc6"
+  top: "fc6"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
+  name: "quantized_fc6"
+  type: "Quantization"
+  bottom: "fc6"
+  top: "fc6"
+  quantization_param {
+    round_method: ROUND
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0
+    range: 1.659358
+  }
+}
+layer {
+  name: "fc7"
+  type: "QuanInnerProduct"
+  bottom: "fc6"
+  top: "fc7"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  quan_inner_product_param {
+    num_output: 4096
+    weight_filler {
+      type: "gaussian"
+      std: 0.005
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+    round_method: ROUND
+    round_strategy: NEUTRAL
+    bit_width: 8
+    range_low: -0.162636
+    range_high: 0.197684
+  }
+}
+layer {
+  name: "bn7"
+  type: "BatchNorm"
+  bottom: "fc7"
+  top: "fc7"
+}
+layer {
+  name: "scale7"
+  type: "Scale"
+  bottom: "fc7"
+  top: "fc7"
+  scale_param {
+    bias_term: true
+  }
+}
+layer {
+  name: "relu7"
+  type: "ReLU"
+  bottom: "fc7"
+  top: "fc7"
+}
+layer {
+  name: "drop7"
+  type: "Dropout"
+  bottom: "fc7"
+  top: "fc7"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
+  name: "quantized_fc7"
+  type: "Quantization"
+  bottom: "fc7"
+  top: "fc7"
+  quantization_param {
+    round_method: ROUND
+    round_strategy: AGGRESSIVE
+    bit_width: 8
+    range: 0
+    range: 7.5598521
+  }
+}
+layer {
+  name: "fc8"
+  type: "QuanInnerProduct"
+  bottom: "fc7"
+  top: "fc8"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  quan_inner_product_param {
+    num_output: 1000
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+    round_method: ROUND
+    round_strategy: NEUTRAL
+    bit_width: 8
+    range_low: -0.141857
+    range_high: 0.274249
+  }
+}
+layer {
+  name: "accuracy"
+  type: "Accuracy"
+  bottom: "fc8"
+  bottom: "label"
+  top: "accuracy"
+  include {
+    phase: TEST
+  }
+}
+layer {
+  name: "accuracy_5"
+  type: "Accuracy"
+  bottom: "fc8"
+  bottom: "label"
+  top: "accuracy_5"
+  include {
+    phase: TEST
+  }
+  accuracy_param {
+    top_k: 5
+  }
+}
+layer {
+  name: "loss"
+  type: "SoftmaxWithLoss"
+  bottom: "fc8"
+  bottom: "label"
+  top: "loss"
+}
+I0110 19:07:05.216715 32604 layer_factory.hpp:77] Creating layer data
+I0110 19:07:05.216828 32604 db_lmdb.cpp:35] Opened lmdb /home/ydwu/database/imagenet/ilsvrc12/lmdb_resize/ilsvrc12_val_lmdb
+I0110 19:07:05.216879 32604 net.cpp:84] Creating Layer data
+I0110 19:07:05.216903 32604 net.cpp:380] data -> data
+I0110 19:07:05.216938 32604 net.cpp:380] data -> label
+I0110 19:07:05.240236 32604 data_layer.cpp:45] output data size: 200,3,224,224
+I0110 19:07:05.615799 32604 net.cpp:122] Setting up data
+I0110 19:07:05.615885 32604 net.cpp:129] Top shape: 200 3 224 224 (30105600)
+I0110 19:07:05.615898 32604 net.cpp:129] Top shape: 200 (200)
+I0110 19:07:05.615908 32604 net.cpp:137] Memory required for data: 120423200
+I0110 19:07:05.615926 32604 layer_factory.hpp:77] Creating layer label_data_1_split
+I0110 19:07:05.615952 32604 net.cpp:84] Creating Layer label_data_1_split
+I0110 19:07:05.615964 32604 net.cpp:406] label_data_1_split <- label
+I0110 19:07:05.615989 32604 net.cpp:380] label_data_1_split -> label_data_1_split_0
+I0110 19:07:05.616009 32604 net.cpp:380] label_data_1_split -> label_data_1_split_1
+I0110 19:07:05.616024 32604 net.cpp:380] label_data_1_split -> label_data_1_split_2
+I0110 19:07:05.616087 32604 net.cpp:122] Setting up label_data_1_split
+I0110 19:07:05.616103 32604 net.cpp:129] Top shape: 200 (200)
+I0110 19:07:05.616113 32604 net.cpp:129] Top shape: 200 (200)
+I0110 19:07:05.616123 32604 net.cpp:129] Top shape: 200 (200)
+I0110 19:07:05.616132 32604 net.cpp:137] Memory required for data: 120425600
+I0110 19:07:05.616142 32604 layer_factory.hpp:77] Creating layer conv1
+I0110 19:07:05.616173 32604 net.cpp:84] Creating Layer conv1
+I0110 19:07:05.616183 32604 net.cpp:406] conv1 <- data
+I0110 19:07:05.616197 32604 net.cpp:380] conv1 -> conv1
+ydwu=======get:
+bit_width=8;  round_method=0;  round_strategy=1;  is_runtime=0;  range_low=-0.872089;  range_high=0.927025
+I0110 19:07:05.637884 32604 net.cpp:122] Setting up conv1
+I0110 19:07:05.637912 32604 net.cpp:129] Top shape: 200 96 55 55 (58080000)
+I0110 19:07:05.637923 32604 net.cpp:137] Memory required for data: 352745600
+I0110 19:07:05.637949 32604 layer_factory.hpp:77] Creating layer bn1
+I0110 19:07:05.637969 32604 net.cpp:84] Creating Layer bn1
+I0110 19:07:05.637992 32604 net.cpp:406] bn1 <- conv1
+I0110 19:07:05.638005 32604 net.cpp:367] bn1 -> conv1 (in-place)
+I0110 19:07:05.638192 32604 net.cpp:122] Setting up bn1
+I0110 19:07:05.638211 32604 net.cpp:129] Top shape: 200 96 55 55 (58080000)
+I0110 19:07:05.638219 32604 net.cpp:137] Memory required for data: 585065600
+I0110 19:07:05.638236 32604 layer_factory.hpp:77] Creating layer scale1
+I0110 19:07:05.638254 32604 net.cpp:84] Creating Layer scale1
+I0110 19:07:05.638264 32604 net.cpp:406] scale1 <- conv1
+I0110 19:07:05.638276 32604 net.cpp:367] scale1 -> conv1 (in-place)
+I0110 19:07:05.638334 32604 layer_factory.hpp:77] Creating layer scale1
+I0110 19:07:05.638464 32604 net.cpp:122] Setting up scale1
+I0110 19:07:05.638481 32604 net.cpp:129] Top shape: 200 96 55 55 (58080000)
+I0110 19:07:05.638490 32604 net.cpp:137] Memory required for data: 817385600
+I0110 19:07:05.638537 32604 layer_factory.hpp:77] Creating layer relu1
+I0110 19:07:05.638555 32604 net.cpp:84] Creating Layer relu1
+I0110 19:07:05.638564 32604 net.cpp:406] relu1 <- conv1
+I0110 19:07:05.638576 32604 net.cpp:367] relu1 -> conv1 (in-place)
+I0110 19:07:05.638590 32604 net.cpp:122] Setting up relu1
+I0110 19:07:05.638602 32604 net.cpp:129] Top shape: 200 96 55 55 (58080000)
+I0110 19:07:05.638610 32604 net.cpp:137] Memory required for data: 1049705600
+I0110 19:07:05.638619 32604 layer_factory.hpp:77] Creating layer pool1
+I0110 19:07:05.638633 32604 net.cpp:84] Creating Layer pool1
+I0110 19:07:05.638643 32604 net.cpp:406] pool1 <- conv1
+I0110 19:07:05.638654 32604 net.cpp:380] pool1 -> pool1
+I0110 19:07:05.638711 32604 net.cpp:122] Setting up pool1
+I0110 19:07:05.638728 32604 net.cpp:129] Top shape: 200 96 27 27 (13996800)
+I0110 19:07:05.638737 32604 net.cpp:137] Memory required for data: 1105692800
+I0110 19:07:05.638746 32604 layer_factory.hpp:77] Creating layer quantized_conv1
+I0110 19:07:05.638761 32604 net.cpp:84] Creating Layer quantized_conv1
+I0110 19:07:05.638772 32604 net.cpp:406] quantized_conv1 <- pool1
+I0110 19:07:05.638783 32604 net.cpp:367] quantized_conv1 -> pool1 (in-place)
+I0110 19:07:05.638799 32604 net.cpp:122] Setting up quantized_conv1
+I0110 19:07:05.638810 32604 net.cpp:129] Top shape: 200 96 27 27 (13996800)
+I0110 19:07:05.638819 32604 net.cpp:137] Memory required for data: 1161680000
+I0110 19:07:05.638828 32604 layer_factory.hpp:77] Creating layer conv2
+I0110 19:07:05.638844 32604 net.cpp:84] Creating Layer conv2
+I0110 19:07:05.638854 32604 net.cpp:406] conv2 <- pool1
+I0110 19:07:05.638866 32604 net.cpp:380] conv2 -> conv2
+ydwu=======get:
+bit_width=8;  round_method=0;  round_strategy=1;  is_runtime=0;  range_low=-0.806018;  range_high=1.5182
+I0110 19:07:05.659637 32604 net.cpp:122] Setting up conv2
+I0110 19:07:05.659670 32604 net.cpp:129] Top shape: 200 256 27 27 (37324800)
+I0110 19:07:05.659680 32604 net.cpp:137] Memory required for data: 1310979200
+I0110 19:07:05.659703 32604 layer_factory.hpp:77] Creating layer bn2
+I0110 19:07:05.659723 32604 net.cpp:84] Creating Layer bn2
+I0110 19:07:05.659734 32604 net.cpp:406] bn2 <- conv2
+I0110 19:07:05.659749 32604 net.cpp:367] bn2 -> conv2 (in-place)
+I0110 19:07:05.659920 32604 net.cpp:122] Setting up bn2
+I0110 19:07:05.659938 32604 net.cpp:129] Top shape: 200 256 27 27 (37324800)
+I0110 19:07:05.659947 32604 net.cpp:137] Memory required for data: 1460278400
+I0110 19:07:05.659960 32604 layer_factory.hpp:77] Creating layer scale2
+I0110 19:07:05.659976 32604 net.cpp:84] Creating Layer scale2
+I0110 19:07:05.659984 32604 net.cpp:406] scale2 <- conv2
+I0110 19:07:05.659996 32604 net.cpp:367] scale2 -> conv2 (in-place)
+I0110 19:07:05.660051 32604 layer_factory.hpp:77] Creating layer scale2
+I0110 19:07:05.660158 32604 net.cpp:122] Setting up scale2
+I0110 19:07:05.660176 32604 net.cpp:129] Top shape: 200 256 27 27 (37324800)
+I0110 19:07:05.660184 32604 net.cpp:137] Memory required for data: 1609577600
+I0110 19:07:05.660197 32604 layer_factory.hpp:77] Creating layer relu2
+I0110 19:07:05.660210 32604 net.cpp:84] Creating Layer relu2
+I0110 19:07:05.660219 32604 net.cpp:406] relu2 <- conv2
+I0110 19:07:05.660230 32604 net.cpp:367] relu2 -> conv2 (in-place)
+I0110 19:07:05.660243 32604 net.cpp:122] Setting up relu2
+I0110 19:07:05.660254 32604 net.cpp:129] Top shape: 200 256 27 27 (37324800)
+I0110 19:07:05.660262 32604 net.cpp:137] Memory required for data: 1758876800
+I0110 19:07:05.660270 32604 layer_factory.hpp:77] Creating layer pool2
+I0110 19:07:05.660284 32604 net.cpp:84] Creating Layer pool2
+I0110 19:07:05.660293 32604 net.cpp:406] pool2 <- conv2
+I0110 19:07:05.660305 32604 net.cpp:380] pool2 -> pool2
+I0110 19:07:05.660352 32604 net.cpp:122] Setting up pool2
+I0110 19:07:05.660368 32604 net.cpp:129] Top shape: 200 256 13 13 (8652800)
+I0110 19:07:05.660377 32604 net.cpp:137] Memory required for data: 1793488000
+I0110 19:07:05.660387 32604 layer_factory.hpp:77] Creating layer quantized_conv2
+I0110 19:07:05.660400 32604 net.cpp:84] Creating Layer quantized_conv2
+I0110 19:07:05.660410 32604 net.cpp:406] quantized_conv2 <- pool2
+I0110 19:07:05.660421 32604 net.cpp:367] quantized_conv2 -> pool2 (in-place)
+I0110 19:07:05.660470 32604 net.cpp:122] Setting up quantized_conv2
+I0110 19:07:05.660483 32604 net.cpp:129] Top shape: 200 256 13 13 (8652800)
+I0110 19:07:05.660493 32604 net.cpp:137] Memory required for data: 1828099200
+I0110 19:07:05.660502 32604 layer_factory.hpp:77] Creating layer conv3
+I0110 19:07:05.660521 32604 net.cpp:84] Creating Layer conv3
+I0110 19:07:05.660531 32604 net.cpp:406] conv3 <- pool2
+I0110 19:07:05.660543 32604 net.cpp:380] conv3 -> conv3
+ydwu=======get:
+bit_width=8;  round_method=0;  round_strategy=1;  is_runtime=0;  range_low=-0.621858;  range_high=0.673858
+I0110 19:07:05.687963 32604 net.cpp:122] Setting up conv3
+I0110 19:07:05.687994 32604 net.cpp:129] Top shape: 200 384 13 13 (12979200)
+I0110 19:07:05.688004 32604 net.cpp:137] Memory required for data: 1880016000
+I0110 19:07:05.688019 32604 layer_factory.hpp:77] Creating layer bn3
+I0110 19:07:05.688038 32604 net.cpp:84] Creating Layer bn3
+I0110 19:07:05.688050 32604 net.cpp:406] bn3 <- conv3
+I0110 19:07:05.688064 32604 net.cpp:367] bn3 -> conv3 (in-place)
+I0110 19:07:05.688231 32604 net.cpp:122] Setting up bn3
+I0110 19:07:05.688248 32604 net.cpp:129] Top shape: 200 384 13 13 (12979200)
+I0110 19:07:05.688257 32604 net.cpp:137] Memory required for data: 1931932800
+I0110 19:07:05.688277 32604 layer_factory.hpp:77] Creating layer scale3
+I0110 19:07:05.688295 32604 net.cpp:84] Creating Layer scale3
+I0110 19:07:05.688305 32604 net.cpp:406] scale3 <- conv3
+I0110 19:07:05.688316 32604 net.cpp:367] scale3 -> conv3 (in-place)
+I0110 19:07:05.688369 32604 layer_factory.hpp:77] Creating layer scale3
+I0110 19:07:05.688482 32604 net.cpp:122] Setting up scale3
+I0110 19:07:05.688498 32604 net.cpp:129] Top shape: 200 384 13 13 (12979200)
+I0110 19:07:05.688506 32604 net.cpp:137] Memory required for data: 1983849600
+I0110 19:07:05.688519 32604 layer_factory.hpp:77] Creating layer relu3
+I0110 19:07:05.688532 32604 net.cpp:84] Creating Layer relu3
+I0110 19:07:05.688541 32604 net.cpp:406] relu3 <- conv3
+I0110 19:07:05.688552 32604 net.cpp:367] relu3 -> conv3 (in-place)
+I0110 19:07:05.688565 32604 net.cpp:122] Setting up relu3
+I0110 19:07:05.688575 32604 net.cpp:129] Top shape: 200 384 13 13 (12979200)
+I0110 19:07:05.688585 32604 net.cpp:137] Memory required for data: 2035766400
+I0110 19:07:05.688593 32604 layer_factory.hpp:77] Creating layer quantized_conv3
+I0110 19:07:05.688606 32604 net.cpp:84] Creating Layer quantized_conv3
+I0110 19:07:05.688616 32604 net.cpp:406] quantized_conv3 <- conv3
+I0110 19:07:05.688627 32604 net.cpp:367] quantized_conv3 -> conv3 (in-place)
+I0110 19:07:05.688639 32604 net.cpp:122] Setting up quantized_conv3
+I0110 19:07:05.688652 32604 net.cpp:129] Top shape: 200 384 13 13 (12979200)
+I0110 19:07:05.688659 32604 net.cpp:137] Memory required for data: 2087683200
+I0110 19:07:05.688668 32604 layer_factory.hpp:77] Creating layer conv4
+I0110 19:07:05.688685 32604 net.cpp:84] Creating Layer conv4
+I0110 19:07:05.688695 32604 net.cpp:406] conv4 <- conv3
+I0110 19:07:05.688709 32604 net.cpp:380] conv4 -> conv4
+ydwu=======get:
+bit_width=8;  round_method=0;  round_strategy=1;  is_runtime=0;  range_low=-0.376634;  range_high=0.341829
+I0110 19:07:05.729812 32604 net.cpp:122] Setting up conv4
+I0110 19:07:05.729846 32604 net.cpp:129] Top shape: 200 384 13 13 (12979200)
+I0110 19:07:05.729856 32604 net.cpp:137] Memory required for data: 2139600000
+I0110 19:07:05.729873 32604 layer_factory.hpp:77] Creating layer bn4
+I0110 19:07:05.729893 32604 net.cpp:84] Creating Layer bn4
+I0110 19:07:05.729905 32604 net.cpp:406] bn4 <- conv4
+I0110 19:07:05.729920 32604 net.cpp:367] bn4 -> conv4 (in-place)
+I0110 19:07:05.730088 32604 net.cpp:122] Setting up bn4
+I0110 19:07:05.730104 32604 net.cpp:129] Top shape: 200 384 13 13 (12979200)
+I0110 19:07:05.730113 32604 net.cpp:137] Memory required for data: 2191516800
+I0110 19:07:05.730128 32604 layer_factory.hpp:77] Creating layer scale4
+I0110 19:07:05.730144 32604 net.cpp:84] Creating Layer scale4
+I0110 19:07:05.730152 32604 net.cpp:406] scale4 <- conv4
+I0110 19:07:05.730165 32604 net.cpp:367] scale4 -> conv4 (in-place)
+I0110 19:07:05.730218 32604 layer_factory.hpp:77] Creating layer scale4
+I0110 19:07:05.730332 32604 net.cpp:122] Setting up scale4
+I0110 19:07:05.730350 32604 net.cpp:129] Top shape: 200 384 13 13 (12979200)
+I0110 19:07:05.730358 32604 net.cpp:137] Memory required for data: 2243433600
+I0110 19:07:05.730415 32604 layer_factory.hpp:77] Creating layer relu4
+I0110 19:07:05.730432 32604 net.cpp:84] Creating Layer relu4
+I0110 19:07:05.730440 32604 net.cpp:406] relu4 <- conv4
+I0110 19:07:05.730453 32604 net.cpp:367] relu4 -> conv4 (in-place)
+I0110 19:07:05.730465 32604 net.cpp:122] Setting up relu4
+I0110 19:07:05.730476 32604 net.cpp:129] Top shape: 200 384 13 13 (12979200)
+I0110 19:07:05.730484 32604 net.cpp:137] Memory required for data: 2295350400
+I0110 19:07:05.730494 32604 layer_factory.hpp:77] Creating layer quantized_conv4
+I0110 19:07:05.730507 32604 net.cpp:84] Creating Layer quantized_conv4
+I0110 19:07:05.730517 32604 net.cpp:406] quantized_conv4 <- conv4
+I0110 19:07:05.730528 32604 net.cpp:367] quantized_conv4 -> conv4 (in-place)
+I0110 19:07:05.730541 32604 net.cpp:122] Setting up quantized_conv4
+I0110 19:07:05.730551 32604 net.cpp:129] Top shape: 200 384 13 13 (12979200)
+I0110 19:07:05.730561 32604 net.cpp:137] Memory required for data: 2347267200
+I0110 19:07:05.730568 32604 layer_factory.hpp:77] Creating layer conv5
+I0110 19:07:05.730587 32604 net.cpp:84] Creating Layer conv5
+I0110 19:07:05.730597 32604 net.cpp:406] conv5 <- conv4
+I0110 19:07:05.730610 32604 net.cpp:380] conv5 -> conv5
+ydwu=======get:
+bit_width=8;  round_method=0;  round_strategy=1;  is_runtime=0;  range_low=-0.347658;  range_high=0.330042
+I0110 19:07:05.758133 32604 net.cpp:122] Setting up conv5
+I0110 19:07:05.758165 32604 net.cpp:129] Top shape: 200 256 13 13 (8652800)
+I0110 19:07:05.758175 32604 net.cpp:137] Memory required for data: 2381878400
+I0110 19:07:05.758190 32604 layer_factory.hpp:77] Creating layer bn5
+I0110 19:07:05.758209 32604 net.cpp:84] Creating Layer bn5
+I0110 19:07:05.758221 32604 net.cpp:406] bn5 <- conv5
+I0110 19:07:05.758235 32604 net.cpp:367] bn5 -> conv5 (in-place)
+I0110 19:07:05.758405 32604 net.cpp:122] Setting up bn5
+I0110 19:07:05.758422 32604 net.cpp:129] Top shape: 200 256 13 13 (8652800)
+I0110 19:07:05.758431 32604 net.cpp:137] Memory required for data: 2416489600
+I0110 19:07:05.758453 32604 layer_factory.hpp:77] Creating layer scale5
+I0110 19:07:05.758468 32604 net.cpp:84] Creating Layer scale5
+I0110 19:07:05.758478 32604 net.cpp:406] scale5 <- conv5
+I0110 19:07:05.758489 32604 net.cpp:367] scale5 -> conv5 (in-place)
+I0110 19:07:05.758546 32604 layer_factory.hpp:77] Creating layer scale5
+I0110 19:07:05.758656 32604 net.cpp:122] Setting up scale5
+I0110 19:07:05.758673 32604 net.cpp:129] Top shape: 200 256 13 13 (8652800)
+I0110 19:07:05.758682 32604 net.cpp:137] Memory required for data: 2451100800
+I0110 19:07:05.758694 32604 layer_factory.hpp:77] Creating layer relu5
+I0110 19:07:05.758708 32604 net.cpp:84] Creating Layer relu5
+I0110 19:07:05.758716 32604 net.cpp:406] relu5 <- conv5
+I0110 19:07:05.758728 32604 net.cpp:367] relu5 -> conv5 (in-place)
+I0110 19:07:05.758740 32604 net.cpp:122] Setting up relu5
+I0110 19:07:05.758751 32604 net.cpp:129] Top shape: 200 256 13 13 (8652800)
+I0110 19:07:05.758759 32604 net.cpp:137] Memory required for data: 2485712000
+I0110 19:07:05.758769 32604 layer_factory.hpp:77] Creating layer pool5
+I0110 19:07:05.758781 32604 net.cpp:84] Creating Layer pool5
+I0110 19:07:05.758791 32604 net.cpp:406] pool5 <- conv5
+I0110 19:07:05.758803 32604 net.cpp:380] pool5 -> pool5
+I0110 19:07:05.758850 32604 net.cpp:122] Setting up pool5
+I0110 19:07:05.758867 32604 net.cpp:129] Top shape: 200 256 6 6 (1843200)
+I0110 19:07:05.758875 32604 net.cpp:137] Memory required for data: 2493084800
+I0110 19:07:05.758884 32604 layer_factory.hpp:77] Creating layer quantized_conv5
+I0110 19:07:05.758898 32604 net.cpp:84] Creating Layer quantized_conv5
+I0110 19:07:05.758908 32604 net.cpp:406] quantized_conv5 <- pool5
+I0110 19:07:05.758919 32604 net.cpp:367] quantized_conv5 -> pool5 (in-place)
+I0110 19:07:05.758932 32604 net.cpp:122] Setting up quantized_conv5
+I0110 19:07:05.758944 32604 net.cpp:129] Top shape: 200 256 6 6 (1843200)
+I0110 19:07:05.758951 32604 net.cpp:137] Memory required for data: 2500457600
+I0110 19:07:05.758965 32604 layer_factory.hpp:77] Creating layer fc6
+I0110 19:07:05.758987 32604 net.cpp:84] Creating Layer fc6
+I0110 19:07:05.758997 32604 net.cpp:406] fc6 <- pool5
+I0110 19:07:05.759052 32604 net.cpp:380] fc6 -> fc6
+I0110 19:07:05.759073 32604 quan_inner_product_layer.cpp:21] 4096   4096
+ydwu=======get:
+bit_width=8;  round_method=0;  round_strategy=1;  is_runtime=0;  range_low=-0.160061;  range_high=0.148064
+I0110 19:07:06.899677 32604 net.cpp:122] Setting up fc6
+I0110 19:07:06.899720 32604 net.cpp:129] Top shape: 200 4096 (819200)
+I0110 19:07:06.899731 32604 net.cpp:137] Memory required for data: 2503734400
+I0110 19:07:06.899749 32604 layer_factory.hpp:77] Creating layer bn6
+I0110 19:07:06.899767 32604 net.cpp:84] Creating Layer bn6
+I0110 19:07:06.899780 32604 net.cpp:406] bn6 <- fc6
+I0110 19:07:06.899794 32604 net.cpp:367] bn6 -> fc6 (in-place)
+I0110 19:07:06.899977 32604 net.cpp:122] Setting up bn6
+I0110 19:07:06.899994 32604 net.cpp:129] Top shape: 200 4096 (819200)
+I0110 19:07:06.900003 32604 net.cpp:137] Memory required for data: 2507011200
+I0110 19:07:06.900017 32604 layer_factory.hpp:77] Creating layer scale6
+I0110 19:07:06.900038 32604 net.cpp:84] Creating Layer scale6
+I0110 19:07:06.900048 32604 net.cpp:406] scale6 <- fc6
+I0110 19:07:06.900059 32604 net.cpp:367] scale6 -> fc6 (in-place)
+I0110 19:07:06.900110 32604 layer_factory.hpp:77] Creating layer scale6
+I0110 19:07:06.900231 32604 net.cpp:122] Setting up scale6
+I0110 19:07:06.900247 32604 net.cpp:129] Top shape: 200 4096 (819200)
+I0110 19:07:06.900256 32604 net.cpp:137] Memory required for data: 2510288000
+I0110 19:07:06.900269 32604 layer_factory.hpp:77] Creating layer relu6
+I0110 19:07:06.900282 32604 net.cpp:84] Creating Layer relu6
+I0110 19:07:06.900292 32604 net.cpp:406] relu6 <- fc6
+I0110 19:07:06.900303 32604 net.cpp:367] relu6 -> fc6 (in-place)
+I0110 19:07:06.900315 32604 net.cpp:122] Setting up relu6
+I0110 19:07:06.900326 32604 net.cpp:129] Top shape: 200 4096 (819200)
+I0110 19:07:06.900334 32604 net.cpp:137] Memory required for data: 2513564800
+I0110 19:07:06.900343 32604 layer_factory.hpp:77] Creating layer drop6
+I0110 19:07:06.900368 32604 net.cpp:84] Creating Layer drop6
+I0110 19:07:06.900378 32604 net.cpp:406] drop6 <- fc6
+I0110 19:07:06.900389 32604 net.cpp:367] drop6 -> fc6 (in-place)
+I0110 19:07:06.900430 32604 net.cpp:122] Setting up drop6
+I0110 19:07:06.900445 32604 net.cpp:129] Top shape: 200 4096 (819200)
+I0110 19:07:06.900454 32604 net.cpp:137] Memory required for data: 2516841600
+I0110 19:07:06.900463 32604 layer_factory.hpp:77] Creating layer quantized_fc6
+I0110 19:07:06.900478 32604 net.cpp:84] Creating Layer quantized_fc6
+I0110 19:07:06.900487 32604 net.cpp:406] quantized_fc6 <- fc6
+I0110 19:07:06.900499 32604 net.cpp:367] quantized_fc6 -> fc6 (in-place)
+I0110 19:07:06.900511 32604 net.cpp:122] Setting up quantized_fc6
+I0110 19:07:06.900522 32604 net.cpp:129] Top shape: 200 4096 (819200)
+I0110 19:07:06.900532 32604 net.cpp:137] Memory required for data: 2520118400
+I0110 19:07:06.900540 32604 layer_factory.hpp:77] Creating layer fc7
+I0110 19:07:06.900554 32604 net.cpp:84] Creating Layer fc7
+I0110 19:07:06.900563 32604 net.cpp:406] fc7 <- fc6
+I0110 19:07:06.900575 32604 net.cpp:380] fc7 -> fc7
+I0110 19:07:06.900590 32604 quan_inner_product_layer.cpp:21] 4096   4096
+ydwu=======get:
+bit_width=8;  round_method=0;  round_strategy=1;  is_runtime=0;  range_low=-0.162636;  range_high=0.197684
+I0110 19:07:07.411274 32604 net.cpp:122] Setting up fc7
+I0110 19:07:07.411310 32604 net.cpp:129] Top shape: 200 4096 (819200)
+I0110 19:07:07.411320 32604 net.cpp:137] Memory required for data: 2523395200
+I0110 19:07:07.411339 32604 layer_factory.hpp:77] Creating layer bn7
+I0110 19:07:07.411357 32604 net.cpp:84] Creating Layer bn7
+I0110 19:07:07.411370 32604 net.cpp:406] bn7 <- fc7
+I0110 19:07:07.411384 32604 net.cpp:367] bn7 -> fc7 (in-place)
+I0110 19:07:07.411568 32604 net.cpp:122] Setting up bn7
+I0110 19:07:07.411586 32604 net.cpp:129] Top shape: 200 4096 (819200)
+I0110 19:07:07.411594 32604 net.cpp:137] Memory required for data: 2526672000
+I0110 19:07:07.411608 32604 layer_factory.hpp:77] Creating layer scale7
+I0110 19:07:07.411623 32604 net.cpp:84] Creating Layer scale7
+I0110 19:07:07.411631 32604 net.cpp:406] scale7 <- fc7
+I0110 19:07:07.411643 32604 net.cpp:367] scale7 -> fc7 (in-place)
+I0110 19:07:07.411694 32604 layer_factory.hpp:77] Creating layer scale7
+I0110 19:07:07.411813 32604 net.cpp:122] Setting up scale7
+I0110 19:07:07.411829 32604 net.cpp:129] Top shape: 200 4096 (819200)
+I0110 19:07:07.411881 32604 net.cpp:137] Memory required for data: 2529948800
+I0110 19:07:07.411895 32604 layer_factory.hpp:77] Creating layer relu7
+I0110 19:07:07.411909 32604 net.cpp:84] Creating Layer relu7
+I0110 19:07:07.411918 32604 net.cpp:406] relu7 <- fc7
+I0110 19:07:07.411929 32604 net.cpp:367] relu7 -> fc7 (in-place)
+I0110 19:07:07.411942 32604 net.cpp:122] Setting up relu7
+I0110 19:07:07.411952 32604 net.cpp:129] Top shape: 200 4096 (819200)
+I0110 19:07:07.411962 32604 net.cpp:137] Memory required for data: 2533225600
+I0110 19:07:07.411969 32604 layer_factory.hpp:77] Creating layer drop7
+I0110 19:07:07.411983 32604 net.cpp:84] Creating Layer drop7
+I0110 19:07:07.411991 32604 net.cpp:406] drop7 <- fc7
+I0110 19:07:07.412003 32604 net.cpp:367] drop7 -> fc7 (in-place)
+I0110 19:07:07.412035 32604 net.cpp:122] Setting up drop7
+I0110 19:07:07.412050 32604 net.cpp:129] Top shape: 200 4096 (819200)
+I0110 19:07:07.412060 32604 net.cpp:137] Memory required for data: 2536502400
+I0110 19:07:07.412067 32604 layer_factory.hpp:77] Creating layer quantized_fc7
+I0110 19:07:07.412081 32604 net.cpp:84] Creating Layer quantized_fc7
+I0110 19:07:07.412091 32604 net.cpp:406] quantized_fc7 <- fc7
+I0110 19:07:07.412102 32604 net.cpp:367] quantized_fc7 -> fc7 (in-place)
+I0110 19:07:07.412114 32604 net.cpp:122] Setting up quantized_fc7
+I0110 19:07:07.412125 32604 net.cpp:129] Top shape: 200 4096 (819200)
+I0110 19:07:07.412133 32604 net.cpp:137] Memory required for data: 2539779200
+I0110 19:07:07.412142 32604 layer_factory.hpp:77] Creating layer fc8
+I0110 19:07:07.412156 32604 net.cpp:84] Creating Layer fc8
+I0110 19:07:07.412165 32604 net.cpp:406] fc8 <- fc7
+I0110 19:07:07.412178 32604 net.cpp:380] fc8 -> fc8
+I0110 19:07:07.412192 32604 quan_inner_product_layer.cpp:21] 1000   1000
+ydwu=======get:
+bit_width=8;  round_method=0;  round_strategy=1;  is_runtime=0;  range_low=-0.141857;  range_high=0.274249
+I0110 19:07:07.539513 32604 net.cpp:122] Setting up fc8
+I0110 19:07:07.539546 32604 net.cpp:129] Top shape: 200 1000 (200000)
+I0110 19:07:07.539556 32604 net.cpp:137] Memory required for data: 2540579200
+I0110 19:07:07.539572 32604 layer_factory.hpp:77] Creating layer fc8_fc8_0_split
+I0110 19:07:07.539592 32604 net.cpp:84] Creating Layer fc8_fc8_0_split
+I0110 19:07:07.539602 32604 net.cpp:406] fc8_fc8_0_split <- fc8
+I0110 19:07:07.539618 32604 net.cpp:380] fc8_fc8_0_split -> fc8_fc8_0_split_0
+I0110 19:07:07.539638 32604 net.cpp:380] fc8_fc8_0_split -> fc8_fc8_0_split_1
+I0110 19:07:07.539651 32604 net.cpp:380] fc8_fc8_0_split -> fc8_fc8_0_split_2
+I0110 19:07:07.539713 32604 net.cpp:122] Setting up fc8_fc8_0_split
+I0110 19:07:07.539729 32604 net.cpp:129] Top shape: 200 1000 (200000)
+I0110 19:07:07.539739 32604 net.cpp:129] Top shape: 200 1000 (200000)
+I0110 19:07:07.539748 32604 net.cpp:129] Top shape: 200 1000 (200000)
+I0110 19:07:07.539757 32604 net.cpp:137] Memory required for data: 2542979200
+I0110 19:07:07.539767 32604 layer_factory.hpp:77] Creating layer accuracy
+I0110 19:07:07.539788 32604 net.cpp:84] Creating Layer accuracy
+I0110 19:07:07.539798 32604 net.cpp:406] accuracy <- fc8_fc8_0_split_0
+I0110 19:07:07.539808 32604 net.cpp:406] accuracy <- label_data_1_split_0
+I0110 19:07:07.539820 32604 net.cpp:380] accuracy -> accuracy
+I0110 19:07:07.539839 32604 net.cpp:122] Setting up accuracy
+I0110 19:07:07.539850 32604 net.cpp:129] Top shape: (1)
+I0110 19:07:07.539858 32604 net.cpp:137] Memory required for data: 2542979204
+I0110 19:07:07.539867 32604 layer_factory.hpp:77] Creating layer accuracy_5
+I0110 19:07:07.539880 32604 net.cpp:84] Creating Layer accuracy_5
+I0110 19:07:07.539889 32604 net.cpp:406] accuracy_5 <- fc8_fc8_0_split_1
+I0110 19:07:07.539898 32604 net.cpp:406] accuracy_5 <- label_data_1_split_1
+I0110 19:07:07.539911 32604 net.cpp:380] accuracy_5 -> accuracy_5
+I0110 19:07:07.539929 32604 net.cpp:122] Setting up accuracy_5
+I0110 19:07:07.539940 32604 net.cpp:129] Top shape: (1)
+I0110 19:07:07.539949 32604 net.cpp:137] Memory required for data: 2542979208
+I0110 19:07:07.539958 32604 layer_factory.hpp:77] Creating layer loss
+I0110 19:07:07.539971 32604 net.cpp:84] Creating Layer loss
+I0110 19:07:07.539981 32604 net.cpp:406] loss <- fc8_fc8_0_split_2
+I0110 19:07:07.540027 32604 net.cpp:406] loss <- label_data_1_split_2
+I0110 19:07:07.540041 32604 net.cpp:380] loss -> loss
+I0110 19:07:07.540062 32604 layer_factory.hpp:77] Creating layer loss
+I0110 19:07:07.541643 32604 net.cpp:122] Setting up loss
+I0110 19:07:07.541664 32604 net.cpp:129] Top shape: (1)
+I0110 19:07:07.541673 32604 net.cpp:132]     with loss weight 1
+I0110 19:07:07.541685 32604 net.cpp:137] Memory required for data: 2542979212
+I0110 19:07:07.541695 32604 net.cpp:198] loss needs backward computation.
+I0110 19:07:07.541705 32604 net.cpp:200] accuracy_5 does not need backward computation.
+I0110 19:07:07.541714 32604 net.cpp:200] accuracy does not need backward computation.
+I0110 19:07:07.541723 32604 net.cpp:198] fc8_fc8_0_split needs backward computation.
+I0110 19:07:07.541733 32604 net.cpp:198] fc8 needs backward computation.
+I0110 19:07:07.541740 32604 net.cpp:198] quantized_fc7 needs backward computation.
+I0110 19:07:07.541749 32604 net.cpp:198] drop7 needs backward computation.
+I0110 19:07:07.541757 32604 net.cpp:198] relu7 needs backward computation.
+I0110 19:07:07.541766 32604 net.cpp:198] scale7 needs backward computation.
+I0110 19:07:07.541774 32604 net.cpp:198] bn7 needs backward computation.
+I0110 19:07:07.541784 32604 net.cpp:198] fc7 needs backward computation.
+I0110 19:07:07.541791 32604 net.cpp:198] quantized_fc6 needs backward computation.
+I0110 19:07:07.541800 32604 net.cpp:198] drop6 needs backward computation.
+I0110 19:07:07.541810 32604 net.cpp:198] relu6 needs backward computation.
+I0110 19:07:07.541818 32604 net.cpp:198] scale6 needs backward computation.
+I0110 19:07:07.541827 32604 net.cpp:198] bn6 needs backward computation.
+I0110 19:07:07.541836 32604 net.cpp:198] fc6 needs backward computation.
+I0110 19:07:07.541846 32604 net.cpp:198] quantized_conv5 needs backward computation.
+I0110 19:07:07.541854 32604 net.cpp:198] pool5 needs backward computation.
+I0110 19:07:07.541863 32604 net.cpp:198] relu5 needs backward computation.
+I0110 19:07:07.541872 32604 net.cpp:198] scale5 needs backward computation.
+I0110 19:07:07.541880 32604 net.cpp:198] bn5 needs backward computation.
+I0110 19:07:07.541888 32604 net.cpp:198] conv5 needs backward computation.
+I0110 19:07:07.541896 32604 net.cpp:198] quantized_conv4 needs backward computation.
+I0110 19:07:07.541905 32604 net.cpp:198] relu4 needs backward computation.
+I0110 19:07:07.541914 32604 net.cpp:198] scale4 needs backward computation.
+I0110 19:07:07.541923 32604 net.cpp:198] bn4 needs backward computation.
+I0110 19:07:07.541930 32604 net.cpp:198] conv4 needs backward computation.
+I0110 19:07:07.541939 32604 net.cpp:198] quantized_conv3 needs backward computation.
+I0110 19:07:07.541949 32604 net.cpp:198] relu3 needs backward computation.
+I0110 19:07:07.541956 32604 net.cpp:198] scale3 needs backward computation.
+I0110 19:07:07.541965 32604 net.cpp:198] bn3 needs backward computation.
+I0110 19:07:07.541973 32604 net.cpp:198] conv3 needs backward computation.
+I0110 19:07:07.541982 32604 net.cpp:198] quantized_conv2 needs backward computation.
+I0110 19:07:07.541991 32604 net.cpp:198] pool2 needs backward computation.
+I0110 19:07:07.542001 32604 net.cpp:198] relu2 needs backward computation.
+I0110 19:07:07.542009 32604 net.cpp:198] scale2 needs backward computation.
+I0110 19:07:07.542017 32604 net.cpp:198] bn2 needs backward computation.
+I0110 19:07:07.542026 32604 net.cpp:198] conv2 needs backward computation.
+I0110 19:07:07.542034 32604 net.cpp:198] quantized_conv1 needs backward computation.
+I0110 19:07:07.542043 32604 net.cpp:198] pool1 needs backward computation.
+I0110 19:07:07.542052 32604 net.cpp:198] relu1 needs backward computation.
+I0110 19:07:07.542062 32604 net.cpp:198] scale1 needs backward computation.
+I0110 19:07:07.542069 32604 net.cpp:198] bn1 needs backward computation.
+I0110 19:07:07.542078 32604 net.cpp:198] conv1 needs backward computation.
+I0110 19:07:07.542088 32604 net.cpp:200] label_data_1_split does not need backward computation.
+I0110 19:07:07.542096 32604 net.cpp:200] data does not need backward computation.
+I0110 19:07:07.542117 32604 net.cpp:242] This network produces output accuracy
+I0110 19:07:07.542129 32604 net.cpp:242] This network produces output accuracy_5
+I0110 19:07:07.542137 32604 net.cpp:242] This network produces output loss
+I0110 19:07:07.542163 32604 net.cpp:255] Network initialization done.
+I0110 19:07:16.971585 32604 caffe.cpp:290] Running for 250 iterations.
+I0110 19:07:18.803948 32604 caffe.cpp:314] Batch 0, accuracy = 0.585
+I0110 19:07:18.804074 32604 caffe.cpp:314] Batch 0, accuracy_5 = 0.845
+I0110 19:07:18.804088 32604 caffe.cpp:314] Batch 0, loss = 1.75718
+I0110 19:07:20.365905 32604 caffe.cpp:314] Batch 1, accuracy = 0.53
+I0110 19:07:20.366029 32604 caffe.cpp:314] Batch 1, accuracy_5 = 0.815
+I0110 19:07:20.366042 32604 caffe.cpp:314] Batch 1, loss = 1.93986
+I0110 19:07:21.907595 32604 caffe.cpp:314] Batch 2, accuracy = 0.61
+I0110 19:07:21.907701 32604 caffe.cpp:314] Batch 2, accuracy_5 = 0.81
+I0110 19:07:21.907718 32604 caffe.cpp:314] Batch 2, loss = 1.82571
+I0110 19:07:23.484266 32604 caffe.cpp:314] Batch 3, accuracy = 0.61
+I0110 19:07:23.484369 32604 caffe.cpp:314] Batch 3, accuracy_5 = 0.82
+I0110 19:07:23.484382 32604 caffe.cpp:314] Batch 3, loss = 1.63105
+I0110 19:07:25.074339 32604 caffe.cpp:314] Batch 4, accuracy = 0.515
+I0110 19:07:25.074465 32604 caffe.cpp:314] Batch 4, accuracy_5 = 0.815
+I0110 19:07:25.074478 32604 caffe.cpp:314] Batch 4, loss = 1.87943
+I0110 19:07:25.074501 32604 blocking_queue.cpp:49] Waiting for data
+I0110 19:07:28.156003 32604 caffe.cpp:314] Batch 5, accuracy = 0.59
+I0110 19:07:28.156113 32604 caffe.cpp:314] Batch 5, accuracy_5 = 0.835
+I0110 19:07:28.156127 32604 caffe.cpp:314] Batch 5, loss = 1.59341
+I0110 19:07:32.324033 32604 caffe.cpp:314] Batch 6, accuracy = 0.62
+I0110 19:07:32.324147 32604 caffe.cpp:314] Batch 6, accuracy_5 = 0.845
+I0110 19:07:32.324162 32604 caffe.cpp:314] Batch 6, loss = 1.61349
+I0110 19:07:36.567720 32604 caffe.cpp:314] Batch 7, accuracy = 0.605
+I0110 19:07:36.594041 32604 caffe.cpp:314] Batch 7, accuracy_5 = 0.79
+I0110 19:07:36.594065 32604 caffe.cpp:314] Batch 7, loss = 1.69396
+I0110 19:07:40.259807 32604 caffe.cpp:314] Batch 8, accuracy = 0.585
+I0110 19:07:40.259868 32604 caffe.cpp:314] Batch 8, accuracy_5 = 0.8
+I0110 19:07:40.259882 32604 caffe.cpp:314] Batch 8, loss = 1.84335
+I0110 19:07:44.032017 32604 caffe.cpp:314] Batch 9, accuracy = 0.56
+I0110 19:07:44.032081 32604 caffe.cpp:314] Batch 9, accuracy_5 = 0.8
+I0110 19:07:44.032094 32604 caffe.cpp:314] Batch 9, loss = 1.81458
+I0110 19:07:47.791785 32604 caffe.cpp:314] Batch 10, accuracy = 0.565
+I0110 19:07:47.791887 32604 caffe.cpp:314] Batch 10, accuracy_5 = 0.795
+I0110 19:07:47.791899 32604 caffe.cpp:314] Batch 10, loss = 1.72183
+I0110 19:07:51.525629 32604 caffe.cpp:314] Batch 11, accuracy = 0.585
+I0110 19:07:51.525691 32604 caffe.cpp:314] Batch 11, accuracy_5 = 0.815
+I0110 19:07:51.525704 32604 caffe.cpp:314] Batch 11, loss = 1.73766
+I0110 19:07:55.340740 32604 caffe.cpp:314] Batch 12, accuracy = 0.65
+I0110 19:07:55.340863 32604 caffe.cpp:314] Batch 12, accuracy_5 = 0.855
+I0110 19:07:55.340876 32604 caffe.cpp:314] Batch 12, loss = 1.53409
+I0110 19:07:59.154717 32604 caffe.cpp:314] Batch 13, accuracy = 0.565
+I0110 19:07:59.154810 32604 caffe.cpp:314] Batch 13, accuracy_5 = 0.795
+I0110 19:07:59.154824 32604 caffe.cpp:314] Batch 13, loss = 1.81406
+I0110 19:08:02.637848 32604 caffe.cpp:314] Batch 14, accuracy = 0.655
+I0110 19:08:02.637960 32604 caffe.cpp:314] Batch 14, accuracy_5 = 0.85
+I0110 19:08:02.637974 32604 caffe.cpp:314] Batch 14, loss = 1.5195
+I0110 19:08:06.382284 32604 caffe.cpp:314] Batch 15, accuracy = 0.57
+I0110 19:08:06.382375 32604 caffe.cpp:314] Batch 15, accuracy_5 = 0.8
+I0110 19:08:06.382390 32604 caffe.cpp:314] Batch 15, loss = 1.75112
+I0110 19:08:10.391527 32604 caffe.cpp:314] Batch 16, accuracy = 0.64
+I0110 19:08:10.391625 32604 caffe.cpp:314] Batch 16, accuracy_5 = 0.86
+I0110 19:08:10.391640 32604 caffe.cpp:314] Batch 16, loss = 1.55059
+I0110 19:08:14.217250 32604 caffe.cpp:314] Batch 17, accuracy = 0.565
+I0110 19:08:14.217373 32604 caffe.cpp:314] Batch 17, accuracy_5 = 0.775
+I0110 19:08:14.217387 32604 caffe.cpp:314] Batch 17, loss = 1.85587
+I0110 19:08:17.234344 32604 caffe.cpp:314] Batch 18, accuracy = 0.625
+I0110 19:08:17.234450 32604 caffe.cpp:314] Batch 18, accuracy_5 = 0.81
+I0110 19:08:17.234468 32604 caffe.cpp:314] Batch 18, loss = 1.66277
+I0110 19:08:20.842975 32604 caffe.cpp:314] Batch 19, accuracy = 0.59
+I0110 19:08:20.843092 32604 caffe.cpp:314] Batch 19, accuracy_5 = 0.845
+I0110 19:08:20.843106 32604 caffe.cpp:314] Batch 19, loss = 1.61195
+I0110 19:08:24.514433 32604 caffe.cpp:314] Batch 20, accuracy = 0.56
+I0110 19:08:24.514539 32604 caffe.cpp:314] Batch 20, accuracy_5 = 0.8
+I0110 19:08:24.514552 32604 caffe.cpp:314] Batch 20, loss = 1.79652
+I0110 19:08:28.360415 32604 caffe.cpp:314] Batch 21, accuracy = 0.54
+I0110 19:08:28.360484 32604 caffe.cpp:314] Batch 21, accuracy_5 = 0.75
+I0110 19:08:28.360498 32604 caffe.cpp:314] Batch 21, loss = 1.98638
+I0110 19:08:31.969697 32604 caffe.cpp:314] Batch 22, accuracy = 0.515
+I0110 19:08:31.969810 32604 caffe.cpp:314] Batch 22, accuracy_5 = 0.795
+I0110 19:08:31.969825 32604 caffe.cpp:314] Batch 22, loss = 2.00083
+I0110 19:08:35.950081 32604 caffe.cpp:314] Batch 23, accuracy = 0.535
+I0110 19:08:35.950168 32604 caffe.cpp:314] Batch 23, accuracy_5 = 0.76
+I0110 19:08:35.950182 32604 caffe.cpp:314] Batch 23, loss = 2.21417
+I0110 19:08:38.444171 32604 caffe.cpp:314] Batch 24, accuracy = 0.56
+I0110 19:08:38.444262 32604 caffe.cpp:314] Batch 24, accuracy_5 = 0.795
+I0110 19:08:38.444275 32604 caffe.cpp:314] Batch 24, loss = 1.75348
+I0110 19:08:40.955426 32604 caffe.cpp:314] Batch 25, accuracy = 0.605
+I0110 19:08:40.955937 32604 caffe.cpp:314] Batch 25, accuracy_5 = 0.83
+I0110 19:08:40.955962 32604 caffe.cpp:314] Batch 25, loss = 1.71377
+I0110 19:08:43.444241 32604 caffe.cpp:314] Batch 26, accuracy = 0.545
+I0110 19:08:43.444344 32604 caffe.cpp:314] Batch 26, accuracy_5 = 0.785
+I0110 19:08:43.444357 32604 caffe.cpp:314] Batch 26, loss = 1.97225
+I0110 19:08:45.799015 32604 caffe.cpp:314] Batch 27, accuracy = 0.605
+I0110 19:08:45.799123 32604 caffe.cpp:314] Batch 27, accuracy_5 = 0.79
+I0110 19:08:45.799135 32604 caffe.cpp:314] Batch 27, loss = 1.88523
+I0110 19:08:47.928306 32604 caffe.cpp:314] Batch 28, accuracy = 0.575
+I0110 19:08:47.928429 32604 caffe.cpp:314] Batch 28, accuracy_5 = 0.795
+I0110 19:08:47.928442 32604 caffe.cpp:314] Batch 28, loss = 1.88571
+I0110 19:08:50.375473 32604 caffe.cpp:314] Batch 29, accuracy = 0.535
+I0110 19:08:50.375535 32604 caffe.cpp:314] Batch 29, accuracy_5 = 0.805
+I0110 19:08:50.375551 32604 caffe.cpp:314] Batch 29, loss = 1.85964
+I0110 19:08:52.872486 32604 caffe.cpp:314] Batch 30, accuracy = 0.57
+I0110 19:08:52.872591 32604 caffe.cpp:314] Batch 30, accuracy_5 = 0.785
+I0110 19:08:52.872604 32604 caffe.cpp:314] Batch 30, loss = 1.86329
+I0110 19:08:55.571084 32604 caffe.cpp:314] Batch 31, accuracy = 0.56
+I0110 19:08:55.571173 32604 caffe.cpp:314] Batch 31, accuracy_5 = 0.805
+I0110 19:08:55.571187 32604 caffe.cpp:314] Batch 31, loss = 1.93777
+I0110 19:08:58.130638 32604 caffe.cpp:314] Batch 32, accuracy = 0.615
+I0110 19:08:58.130697 32604 caffe.cpp:314] Batch 32, accuracy_5 = 0.825
+I0110 19:08:58.130709 32604 caffe.cpp:314] Batch 32, loss = 1.71664
+I0110 19:09:00.973121 32604 caffe.cpp:314] Batch 33, accuracy = 0.525
+I0110 19:09:00.973182 32604 caffe.cpp:314] Batch 33, accuracy_5 = 0.81
+I0110 19:09:00.973196 32604 caffe.cpp:314] Batch 33, loss = 1.91167
+I0110 19:09:04.035398 32604 caffe.cpp:314] Batch 34, accuracy = 0.575
+I0110 19:09:04.035461 32604 caffe.cpp:314] Batch 34, accuracy_5 = 0.835
+I0110 19:09:04.035475 32604 caffe.cpp:314] Batch 34, loss = 1.88723
+I0110 19:09:07.553088 32604 caffe.cpp:314] Batch 35, accuracy = 0.575
+I0110 19:09:07.553148 32604 caffe.cpp:314] Batch 35, accuracy_5 = 0.8
+I0110 19:09:07.553165 32604 caffe.cpp:314] Batch 35, loss = 1.77536
+I0110 19:09:10.744236 32604 caffe.cpp:314] Batch 36, accuracy = 0.595
+I0110 19:09:10.744287 32604 caffe.cpp:314] Batch 36, accuracy_5 = 0.77
+I0110 19:09:10.744295 32604 caffe.cpp:314] Batch 36, loss = 1.82421
+I0110 19:09:13.460669 32604 caffe.cpp:314] Batch 37, accuracy = 0.56
+I0110 19:09:13.461366 32604 caffe.cpp:314] Batch 37, accuracy_5 = 0.82
+I0110 19:09:13.461385 32604 caffe.cpp:314] Batch 37, loss = 1.69121
+I0110 19:09:15.633009 32604 caffe.cpp:314] Batch 38, accuracy = 0.54
+I0110 19:09:15.633113 32604 caffe.cpp:314] Batch 38, accuracy_5 = 0.79
+I0110 19:09:15.633131 32604 caffe.cpp:314] Batch 38, loss = 1.88043
+I0110 19:09:18.805667 32604 caffe.cpp:314] Batch 39, accuracy = 0.505
+I0110 19:09:18.805765 32604 caffe.cpp:314] Batch 39, accuracy_5 = 0.82
+I0110 19:09:18.805778 32604 caffe.cpp:314] Batch 39, loss = 1.92871
+I0110 19:09:21.956576 32604 caffe.cpp:314] Batch 40, accuracy = 0.57
+I0110 19:09:21.956684 32604 caffe.cpp:314] Batch 40, accuracy_5 = 0.81
+I0110 19:09:21.956701 32604 caffe.cpp:314] Batch 40, loss = 1.83425
+I0110 19:09:24.934772 32604 caffe.cpp:314] Batch 41, accuracy = 0.585
+I0110 19:09:24.934875 32604 caffe.cpp:314] Batch 41, accuracy_5 = 0.77
+I0110 19:09:24.934888 32604 caffe.cpp:314] Batch 41, loss = 2.03458
+I0110 19:09:27.784327 32604 caffe.cpp:314] Batch 42, accuracy = 0.58
+I0110 19:09:27.784389 32604 caffe.cpp:314] Batch 42, accuracy_5 = 0.79
+I0110 19:09:27.784402 32604 caffe.cpp:314] Batch 42, loss = 1.85594
+I0110 19:09:30.314383 32604 caffe.cpp:314] Batch 43, accuracy = 0.545
+I0110 19:09:30.314437 32604 caffe.cpp:314] Batch 43, accuracy_5 = 0.765
+I0110 19:09:30.314453 32604 caffe.cpp:314] Batch 43, loss = 1.9094
+I0110 19:09:33.446203 32604 caffe.cpp:314] Batch 44, accuracy = 0.57
+I0110 19:09:33.446306 32604 caffe.cpp:314] Batch 44, accuracy_5 = 0.765
+I0110 19:09:33.446324 32604 caffe.cpp:314] Batch 44, loss = 2.00733
+I0110 19:09:36.574813 32604 caffe.cpp:314] Batch 45, accuracy = 0.585
+I0110 19:09:36.574913 32604 caffe.cpp:314] Batch 45, accuracy_5 = 0.8
+I0110 19:09:36.574931 32604 caffe.cpp:314] Batch 45, loss = 1.88306
+I0110 19:09:39.603057 32604 caffe.cpp:314] Batch 46, accuracy = 0.63
+I0110 19:09:39.603155 32604 caffe.cpp:314] Batch 46, accuracy_5 = 0.83
+I0110 19:09:39.603168 32604 caffe.cpp:314] Batch 46, loss = 1.5959
+I0110 19:09:42.552325 32604 caffe.cpp:314] Batch 47, accuracy = 0.66
+I0110 19:09:42.552388 32604 caffe.cpp:314] Batch 47, accuracy_5 = 0.87
+I0110 19:09:42.552405 32604 caffe.cpp:314] Batch 47, loss = 1.37647
+I0110 19:09:45.583286 32604 caffe.cpp:314] Batch 48, accuracy = 0.605
+I0110 19:09:45.583590 32604 caffe.cpp:314] Batch 48, accuracy_5 = 0.82
+I0110 19:09:45.583621 32604 caffe.cpp:314] Batch 48, loss = 1.71576
+I0110 19:09:48.654769 32604 caffe.cpp:314] Batch 49, accuracy = 0.52
+I0110 19:09:48.654878 32604 caffe.cpp:314] Batch 49, accuracy_5 = 0.74
+I0110 19:09:48.654896 32604 caffe.cpp:314] Batch 49, loss = 2.11761
+I0110 19:09:51.473206 32604 caffe.cpp:314] Batch 50, accuracy = 0.61
+I0110 19:09:51.473315 32604 caffe.cpp:314] Batch 50, accuracy_5 = 0.835
+I0110 19:09:51.473331 32604 caffe.cpp:314] Batch 50, loss = 1.75869
+I0110 19:09:54.222561 32604 caffe.cpp:314] Batch 51, accuracy = 0.595
+I0110 19:09:54.222663 32604 caffe.cpp:314] Batch 51, accuracy_5 = 0.805
+I0110 19:09:54.222676 32604 caffe.cpp:314] Batch 51, loss = 1.79425
+I0110 19:09:57.183482 32604 caffe.cpp:314] Batch 52, accuracy = 0.54
+I0110 19:09:57.183606 32604 caffe.cpp:314] Batch 52, accuracy_5 = 0.755
+I0110 19:09:57.183620 32604 caffe.cpp:314] Batch 52, loss = 2.05109
+I0110 19:10:00.487550 32604 caffe.cpp:314] Batch 53, accuracy = 0.585
+I0110 19:10:00.487665 32604 caffe.cpp:314] Batch 53, accuracy_5 = 0.81
+I0110 19:10:00.487679 32604 caffe.cpp:314] Batch 53, loss = 1.8072
+I0110 19:10:03.441787 32604 caffe.cpp:314] Batch 54, accuracy = 0.615
+I0110 19:10:03.441880 32604 caffe.cpp:314] Batch 54, accuracy_5 = 0.815
+I0110 19:10:03.441893 32604 caffe.cpp:314] Batch 54, loss = 1.54943
+I0110 19:10:06.620697 32604 caffe.cpp:314] Batch 55, accuracy = 0.555
+I0110 19:10:06.620793 32604 caffe.cpp:314] Batch 55, accuracy_5 = 0.82
+I0110 19:10:06.620806 32604 caffe.cpp:314] Batch 55, loss = 1.92299
+I0110 19:10:09.230155 32604 caffe.cpp:314] Batch 56, accuracy = 0.63
+I0110 19:10:09.230279 32604 caffe.cpp:314] Batch 56, accuracy_5 = 0.805
+I0110 19:10:09.230293 32604 caffe.cpp:314] Batch 56, loss = 1.66778
+I0110 19:10:11.917652 32604 caffe.cpp:314] Batch 57, accuracy = 0.585
+I0110 19:10:11.917717 32604 caffe.cpp:314] Batch 57, accuracy_5 = 0.76
+I0110 19:10:11.917731 32604 caffe.cpp:314] Batch 57, loss = 1.89504
+I0110 19:10:14.151705 32604 caffe.cpp:314] Batch 58, accuracy = 0.62
+I0110 19:10:14.151826 32604 caffe.cpp:314] Batch 58, accuracy_5 = 0.81
+I0110 19:10:14.151839 32604 caffe.cpp:314] Batch 58, loss = 1.67914
+I0110 19:10:16.156031 32604 caffe.cpp:314] Batch 59, accuracy = 0.55
+I0110 19:10:16.156457 32604 caffe.cpp:314] Batch 59, accuracy_5 = 0.805
+I0110 19:10:16.156476 32604 caffe.cpp:314] Batch 59, loss = 1.91699
+I0110 19:10:18.665073 32604 caffe.cpp:314] Batch 60, accuracy = 0.615
+I0110 19:10:18.665192 32604 caffe.cpp:314] Batch 60, accuracy_5 = 0.83
+I0110 19:10:18.665206 32604 caffe.cpp:314] Batch 60, loss = 1.66922
+I0110 19:10:21.401046 32604 caffe.cpp:314] Batch 61, accuracy = 0.595
+I0110 19:10:21.401136 32604 caffe.cpp:314] Batch 61, accuracy_5 = 0.79
+I0110 19:10:21.401150 32604 caffe.cpp:314] Batch 61, loss = 1.83146
+I0110 19:10:24.323845 32604 caffe.cpp:314] Batch 62, accuracy = 0.505
+I0110 19:10:24.323907 32604 caffe.cpp:314] Batch 62, accuracy_5 = 0.74
+I0110 19:10:24.323920 32604 caffe.cpp:314] Batch 62, loss = 2.15735
+I0110 19:10:26.907981 32604 caffe.cpp:314] Batch 63, accuracy = 0.59
+I0110 19:10:26.908112 32604 caffe.cpp:314] Batch 63, accuracy_5 = 0.795
+I0110 19:10:26.908126 32604 caffe.cpp:314] Batch 63, loss = 1.87934
+I0110 19:10:29.321671 32604 caffe.cpp:314] Batch 64, accuracy = 0.67
+I0110 19:10:29.321766 32604 caffe.cpp:314] Batch 64, accuracy_5 = 0.87
+I0110 19:10:29.321784 32604 caffe.cpp:314] Batch 64, loss = 1.44918
+I0110 19:10:31.939743 32604 caffe.cpp:314] Batch 65, accuracy = 0.635
+I0110 19:10:31.939797 32604 caffe.cpp:314] Batch 65, accuracy_5 = 0.825
+I0110 19:10:31.939815 32604 caffe.cpp:314] Batch 65, loss = 1.57538
+I0110 19:10:36.227135 32604 caffe.cpp:314] Batch 66, accuracy = 0.645
+I0110 19:10:36.227221 32604 caffe.cpp:314] Batch 66, accuracy_5 = 0.85
+I0110 19:10:36.227233 32604 caffe.cpp:314] Batch 66, loss = 1.65875
+I0110 19:10:39.989742 32604 caffe.cpp:314] Batch 67, accuracy = 0.595
+I0110 19:10:39.989781 32604 caffe.cpp:314] Batch 67, accuracy_5 = 0.835
+I0110 19:10:39.989789 32604 caffe.cpp:314] Batch 67, loss = 1.69682
+I0110 19:10:43.063256 32604 caffe.cpp:314] Batch 68, accuracy = 0.575
+I0110 19:10:43.063385 32604 caffe.cpp:314] Batch 68, accuracy_5 = 0.815
+I0110 19:10:43.063400 32604 caffe.cpp:314] Batch 68, loss = 1.84307
+I0110 19:10:47.205509 32604 caffe.cpp:314] Batch 69, accuracy = 0.57
+I0110 19:10:47.205948 32604 caffe.cpp:314] Batch 69, accuracy_5 = 0.83
+I0110 19:10:47.205965 32604 caffe.cpp:314] Batch 69, loss = 1.70954
+I0110 19:10:50.694401 32604 caffe.cpp:314] Batch 70, accuracy = 0.565
+I0110 19:10:50.694506 32604 caffe.cpp:314] Batch 70, accuracy_5 = 0.865
+I0110 19:10:50.694524 32604 caffe.cpp:314] Batch 70, loss = 1.68033
+I0110 19:10:54.140902 32604 caffe.cpp:314] Batch 71, accuracy = 0.555
+I0110 19:10:54.141005 32604 caffe.cpp:314] Batch 71, accuracy_5 = 0.825
+I0110 19:10:54.141017 32604 caffe.cpp:314] Batch 71, loss = 1.7195
+I0110 19:10:56.337446 32604 caffe.cpp:314] Batch 72, accuracy = 0.575
+I0110 19:10:56.337560 32604 caffe.cpp:314] Batch 72, accuracy_5 = 0.795
+I0110 19:10:56.337574 32604 caffe.cpp:314] Batch 72, loss = 1.78568
+I0110 19:10:58.796931 32604 caffe.cpp:314] Batch 73, accuracy = 0.56
+I0110 19:10:58.797049 32604 caffe.cpp:314] Batch 73, accuracy_5 = 0.825
+I0110 19:10:58.797061 32604 caffe.cpp:314] Batch 73, loss = 1.72064
+I0110 19:11:01.459287 32604 caffe.cpp:314] Batch 74, accuracy = 0.545
+I0110 19:11:01.459405 32604 caffe.cpp:314] Batch 74, accuracy_5 = 0.79
+I0110 19:11:01.459419 32604 caffe.cpp:314] Batch 74, loss = 2.01412
+I0110 19:11:03.499687 32604 caffe.cpp:314] Batch 75, accuracy = 0.545
+I0110 19:11:03.499805 32604 caffe.cpp:314] Batch 75, accuracy_5 = 0.805
+I0110 19:11:03.499819 32604 caffe.cpp:314] Batch 75, loss = 1.96541
+I0110 19:11:05.989981 32604 caffe.cpp:314] Batch 76, accuracy = 0.59
+I0110 19:11:05.990088 32604 caffe.cpp:314] Batch 76, accuracy_5 = 0.815
+I0110 19:11:05.990101 32604 caffe.cpp:314] Batch 76, loss = 1.66502
+I0110 19:11:08.377861 32604 caffe.cpp:314] Batch 77, accuracy = 0.6
+I0110 19:11:08.377970 32604 caffe.cpp:314] Batch 77, accuracy_5 = 0.86
+I0110 19:11:08.377984 32604 caffe.cpp:314] Batch 77, loss = 1.59952
+I0110 19:11:10.748493 32604 caffe.cpp:314] Batch 78, accuracy = 0.57
+I0110 19:11:10.748594 32604 caffe.cpp:314] Batch 78, accuracy_5 = 0.775
+I0110 19:11:10.748608 32604 caffe.cpp:314] Batch 78, loss = 1.86255
+I0110 19:11:13.185434 32604 caffe.cpp:314] Batch 79, accuracy = 0.58
+I0110 19:11:13.185541 32604 caffe.cpp:314] Batch 79, accuracy_5 = 0.85
+I0110 19:11:13.185559 32604 caffe.cpp:314] Batch 79, loss = 1.76771
+I0110 19:11:17.079804 32604 caffe.cpp:314] Batch 80, accuracy = 0.53
+I0110 19:11:17.079916 32604 caffe.cpp:314] Batch 80, accuracy_5 = 0.79
+I0110 19:11:17.079931 32604 caffe.cpp:314] Batch 80, loss = 1.82392
+I0110 19:11:20.873234 32604 caffe.cpp:314] Batch 81, accuracy = 0.615
+I0110 19:11:20.873610 32604 caffe.cpp:314] Batch 81, accuracy_5 = 0.825
+I0110 19:11:20.873627 32604 caffe.cpp:314] Batch 81, loss = 1.73627
+I0110 19:11:24.208596 32604 caffe.cpp:314] Batch 82, accuracy = 0.565
+I0110 19:11:24.208653 32604 caffe.cpp:314] Batch 82, accuracy_5 = 0.82
+I0110 19:11:24.208667 32604 caffe.cpp:314] Batch 82, loss = 1.9365
+I0110 19:11:28.187826 32604 caffe.cpp:314] Batch 83, accuracy = 0.615
+I0110 19:11:28.187922 32604 caffe.cpp:314] Batch 83, accuracy_5 = 0.81
+I0110 19:11:28.187935 32604 caffe.cpp:314] Batch 83, loss = 1.70728
+I0110 19:11:31.276199 32604 caffe.cpp:314] Batch 84, accuracy = 0.555
+I0110 19:11:31.276299 32604 caffe.cpp:314] Batch 84, accuracy_5 = 0.795
+I0110 19:11:31.276314 32604 caffe.cpp:314] Batch 84, loss = 1.92366
+I0110 19:11:34.081055 32604 caffe.cpp:314] Batch 85, accuracy = 0.555
+I0110 19:11:34.081151 32604 caffe.cpp:314] Batch 85, accuracy_5 = 0.77
+I0110 19:11:34.081164 32604 caffe.cpp:314] Batch 85, loss = 1.95963
+I0110 19:11:36.580227 32604 caffe.cpp:314] Batch 86, accuracy = 0.575
+I0110 19:11:36.580322 32604 caffe.cpp:314] Batch 86, accuracy_5 = 0.835
+I0110 19:11:36.580337 32604 caffe.cpp:314] Batch 86, loss = 1.61831
+I0110 19:11:39.059067 32604 caffe.cpp:314] Batch 87, accuracy = 0.575
+I0110 19:11:39.059165 32604 caffe.cpp:314] Batch 87, accuracy_5 = 0.84
+I0110 19:11:39.059177 32604 caffe.cpp:314] Batch 87, loss = 1.62896
+I0110 19:11:41.488965 32604 caffe.cpp:314] Batch 88, accuracy = 0.57
+I0110 19:11:41.489064 32604 caffe.cpp:314] Batch 88, accuracy_5 = 0.81
+I0110 19:11:41.489078 32604 caffe.cpp:314] Batch 88, loss = 1.88233
+I0110 19:11:44.207726 32604 caffe.cpp:314] Batch 89, accuracy = 0.555
+I0110 19:11:44.207842 32604 caffe.cpp:314] Batch 89, accuracy_5 = 0.81
+I0110 19:11:44.207855 32604 caffe.cpp:314] Batch 89, loss = 1.91829
+I0110 19:11:47.468479 32604 caffe.cpp:314] Batch 90, accuracy = 0.575
+I0110 19:11:47.468580 32604 caffe.cpp:314] Batch 90, accuracy_5 = 0.815
+I0110 19:11:47.468592 32604 caffe.cpp:314] Batch 90, loss = 1.628
+I0110 19:11:50.516314 32604 caffe.cpp:314] Batch 91, accuracy = 0.575
+I0110 19:11:50.516434 32604 caffe.cpp:314] Batch 91, accuracy_5 = 0.825
+I0110 19:11:50.516448 32604 caffe.cpp:314] Batch 91, loss = 1.82684
+I0110 19:11:53.342658 32604 caffe.cpp:314] Batch 92, accuracy = 0.6
+I0110 19:11:53.343101 32604 caffe.cpp:314] Batch 92, accuracy_5 = 0.79
+I0110 19:11:53.343119 32604 caffe.cpp:314] Batch 92, loss = 1.94918
+I0110 19:11:56.320926 32604 caffe.cpp:314] Batch 93, accuracy = 0.59
+I0110 19:11:56.321040 32604 caffe.cpp:314] Batch 93, accuracy_5 = 0.815
+I0110 19:11:56.321053 32604 caffe.cpp:314] Batch 93, loss = 1.72602
+I0110 19:11:59.229881 32604 caffe.cpp:314] Batch 94, accuracy = 0.555
+I0110 19:11:59.229979 32604 caffe.cpp:314] Batch 94, accuracy_5 = 0.83
+I0110 19:11:59.229993 32604 caffe.cpp:314] Batch 94, loss = 1.81096
+I0110 19:12:01.912003 32604 caffe.cpp:314] Batch 95, accuracy = 0.555
+I0110 19:12:01.912068 32604 caffe.cpp:314] Batch 95, accuracy_5 = 0.79
+I0110 19:12:01.912082 32604 caffe.cpp:314] Batch 95, loss = 1.93772
+I0110 19:12:05.920599 32604 caffe.cpp:314] Batch 96, accuracy = 0.57
+I0110 19:12:05.920653 32604 caffe.cpp:314] Batch 96, accuracy_5 = 0.765
+I0110 19:12:05.920666 32604 caffe.cpp:314] Batch 96, loss = 1.80695
+I0110 19:12:08.577549 32604 caffe.cpp:314] Batch 97, accuracy = 0.615
+I0110 19:12:08.577613 32604 caffe.cpp:314] Batch 97, accuracy_5 = 0.87
+I0110 19:12:08.577630 32604 caffe.cpp:314] Batch 97, loss = 1.58133
+I0110 19:12:11.463906 32604 caffe.cpp:314] Batch 98, accuracy = 0.595
+I0110 19:12:11.463971 32604 caffe.cpp:314] Batch 98, accuracy_5 = 0.83
+I0110 19:12:11.463984 32604 caffe.cpp:314] Batch 98, loss = 1.70529
+I0110 19:12:14.066597 32604 caffe.cpp:314] Batch 99, accuracy = 0.62
+I0110 19:12:14.066695 32604 caffe.cpp:314] Batch 99, accuracy_5 = 0.86
+I0110 19:12:14.066709 32604 caffe.cpp:314] Batch 99, loss = 1.75996
+I0110 19:12:17.234737 32604 caffe.cpp:314] Batch 100, accuracy = 0.58
+I0110 19:12:17.234838 32604 caffe.cpp:314] Batch 100, accuracy_5 = 0.88
+I0110 19:12:17.234851 32604 caffe.cpp:314] Batch 100, loss = 1.60515
+I0110 19:12:20.515955 32604 caffe.cpp:314] Batch 101, accuracy = 0.605
+I0110 19:12:20.516018 32604 caffe.cpp:314] Batch 101, accuracy_5 = 0.805
+I0110 19:12:20.516031 32604 caffe.cpp:314] Batch 101, loss = 1.97756
+I0110 19:12:23.271844 32604 caffe.cpp:314] Batch 102, accuracy = 0.645
+I0110 19:12:23.271899 32604 caffe.cpp:314] Batch 102, accuracy_5 = 0.835
+I0110 19:12:23.271919 32604 caffe.cpp:314] Batch 102, loss = 1.54564
+I0110 19:12:26.620853 32604 caffe.cpp:314] Batch 103, accuracy = 0.575
+I0110 19:12:26.621166 32604 caffe.cpp:314] Batch 103, accuracy_5 = 0.79
+I0110 19:12:26.621192 32604 caffe.cpp:314] Batch 103, loss = 1.97444
+I0110 19:12:29.400224 32604 caffe.cpp:314] Batch 104, accuracy = 0.565
+I0110 19:12:29.400288 32604 caffe.cpp:314] Batch 104, accuracy_5 = 0.785
+I0110 19:12:29.400301 32604 caffe.cpp:314] Batch 104, loss = 1.92852
+I0110 19:12:31.674042 32604 caffe.cpp:314] Batch 105, accuracy = 0.59
+I0110 19:12:31.674132 32604 caffe.cpp:314] Batch 105, accuracy_5 = 0.86
+I0110 19:12:31.674145 32604 caffe.cpp:314] Batch 105, loss = 1.6432
+I0110 19:12:34.245877 32604 caffe.cpp:314] Batch 106, accuracy = 0.505
+I0110 19:12:34.245972 32604 caffe.cpp:314] Batch 106, accuracy_5 = 0.83
+I0110 19:12:34.245990 32604 caffe.cpp:314] Batch 106, loss = 1.76679
+I0110 19:12:36.614274 32604 caffe.cpp:314] Batch 107, accuracy = 0.57
+I0110 19:12:36.614372 32604 caffe.cpp:314] Batch 107, accuracy_5 = 0.775
+I0110 19:12:36.614384 32604 caffe.cpp:314] Batch 107, loss = 1.71297
+I0110 19:12:39.561714 32604 caffe.cpp:314] Batch 108, accuracy = 0.665
+I0110 19:12:39.561780 32604 caffe.cpp:314] Batch 108, accuracy_5 = 0.85
+I0110 19:12:39.561797 32604 caffe.cpp:314] Batch 108, loss = 1.58498
+I0110 19:12:42.147930 32604 caffe.cpp:314] Batch 109, accuracy = 0.585
+I0110 19:12:42.148027 32604 caffe.cpp:314] Batch 109, accuracy_5 = 0.805
+I0110 19:12:42.148043 32604 caffe.cpp:314] Batch 109, loss = 1.73582
+I0110 19:12:45.361495 32604 caffe.cpp:314] Batch 110, accuracy = 0.605
+I0110 19:12:45.361596 32604 caffe.cpp:314] Batch 110, accuracy_5 = 0.79
+I0110 19:12:45.361610 32604 caffe.cpp:314] Batch 110, loss = 1.77289
+I0110 19:12:47.870246 32604 caffe.cpp:314] Batch 111, accuracy = 0.56
+I0110 19:12:47.870352 32604 caffe.cpp:314] Batch 111, accuracy_5 = 0.785
+I0110 19:12:47.870365 32604 caffe.cpp:314] Batch 111, loss = 1.83379
+I0110 19:12:50.146035 32604 caffe.cpp:314] Batch 112, accuracy = 0.595
+I0110 19:12:50.146176 32604 caffe.cpp:314] Batch 112, accuracy_5 = 0.775
+I0110 19:12:50.146189 32604 caffe.cpp:314] Batch 112, loss = 1.77335
+I0110 19:12:52.275775 32604 caffe.cpp:314] Batch 113, accuracy = 0.59
+I0110 19:12:52.275867 32604 caffe.cpp:314] Batch 113, accuracy_5 = 0.82
+I0110 19:12:52.275880 32604 caffe.cpp:314] Batch 113, loss = 1.66563
+I0110 19:12:55.135947 32604 caffe.cpp:314] Batch 114, accuracy = 0.575
+I0110 19:12:55.136052 32604 caffe.cpp:314] Batch 114, accuracy_5 = 0.835
+I0110 19:12:55.136065 32604 caffe.cpp:314] Batch 114, loss = 1.83821
+I0110 19:12:57.551618 32604 caffe.cpp:314] Batch 115, accuracy = 0.535
+I0110 19:12:57.552012 32604 caffe.cpp:314] Batch 115, accuracy_5 = 0.77
+I0110 19:12:57.552031 32604 caffe.cpp:314] Batch 115, loss = 2.03593
+I0110 19:12:59.952252 32604 caffe.cpp:314] Batch 116, accuracy = 0.545
+I0110 19:12:59.952375 32604 caffe.cpp:314] Batch 116, accuracy_5 = 0.77
+I0110 19:12:59.952389 32604 caffe.cpp:314] Batch 116, loss = 1.89285
+I0110 19:13:02.633898 32604 caffe.cpp:314] Batch 117, accuracy = 0.575
+I0110 19:13:02.633955 32604 caffe.cpp:314] Batch 117, accuracy_5 = 0.785
+I0110 19:13:02.633967 32604 caffe.cpp:314] Batch 117, loss = 1.94165
+I0110 19:13:05.231703 32604 caffe.cpp:314] Batch 118, accuracy = 0.595
+I0110 19:13:05.231767 32604 caffe.cpp:314] Batch 118, accuracy_5 = 0.815
+I0110 19:13:05.231784 32604 caffe.cpp:314] Batch 118, loss = 1.74165
+I0110 19:13:07.578076 32604 caffe.cpp:314] Batch 119, accuracy = 0.595
+I0110 19:13:07.578131 32604 caffe.cpp:314] Batch 119, accuracy_5 = 0.815
+I0110 19:13:07.578148 32604 caffe.cpp:314] Batch 119, loss = 1.65897
+I0110 19:13:10.890648 32604 caffe.cpp:314] Batch 120, accuracy = 0.545
+I0110 19:13:10.890705 32604 caffe.cpp:314] Batch 120, accuracy_5 = 0.785
+I0110 19:13:10.890718 32604 caffe.cpp:314] Batch 120, loss = 1.87175
+I0110 19:13:13.588407 32604 caffe.cpp:314] Batch 121, accuracy = 0.585
+I0110 19:13:13.588465 32604 caffe.cpp:314] Batch 121, accuracy_5 = 0.855
+I0110 19:13:13.588479 32604 caffe.cpp:314] Batch 121, loss = 1.60952
+I0110 19:13:16.083725 32604 caffe.cpp:314] Batch 122, accuracy = 0.62
+I0110 19:13:16.083784 32604 caffe.cpp:314] Batch 122, accuracy_5 = 0.825
+I0110 19:13:16.083819 32604 caffe.cpp:314] Batch 122, loss = 1.5961
+I0110 19:13:18.509891 32604 caffe.cpp:314] Batch 123, accuracy = 0.58
+I0110 19:13:18.509945 32604 caffe.cpp:314] Batch 123, accuracy_5 = 0.85
+I0110 19:13:18.509963 32604 caffe.cpp:314] Batch 123, loss = 1.62911
+I0110 19:13:21.202261 32604 caffe.cpp:314] Batch 124, accuracy = 0.555
+I0110 19:13:21.202317 32604 caffe.cpp:314] Batch 124, accuracy_5 = 0.75
+I0110 19:13:21.202332 32604 caffe.cpp:314] Batch 124, loss = 2.01901
+I0110 19:13:23.810372 32604 caffe.cpp:314] Batch 125, accuracy = 0.61
+I0110 19:13:23.810483 32604 caffe.cpp:314] Batch 125, accuracy_5 = 0.805
+I0110 19:13:23.810497 32604 caffe.cpp:314] Batch 125, loss = 1.78408
+I0110 19:13:26.474794 32604 caffe.cpp:314] Batch 126, accuracy = 0.615
+I0110 19:13:26.474896 32604 caffe.cpp:314] Batch 126, accuracy_5 = 0.825
+I0110 19:13:26.474910 32604 caffe.cpp:314] Batch 126, loss = 1.66271
+I0110 19:13:29.091809 32604 caffe.cpp:314] Batch 127, accuracy = 0.61
+I0110 19:13:29.092078 32604 caffe.cpp:314] Batch 127, accuracy_5 = 0.85
+I0110 19:13:29.092101 32604 caffe.cpp:314] Batch 127, loss = 1.72436
+I0110 19:13:31.746196 32604 caffe.cpp:314] Batch 128, accuracy = 0.59
+I0110 19:13:31.746282 32604 caffe.cpp:314] Batch 128, accuracy_5 = 0.81
+I0110 19:13:31.746295 32604 caffe.cpp:314] Batch 128, loss = 1.73496
+I0110 19:13:34.118960 32604 caffe.cpp:314] Batch 129, accuracy = 0.555
+I0110 19:13:34.119016 32604 caffe.cpp:314] Batch 129, accuracy_5 = 0.775
+I0110 19:13:34.119029 32604 caffe.cpp:314] Batch 129, loss = 1.95256
+I0110 19:13:37.154500 32604 caffe.cpp:314] Batch 130, accuracy = 0.535
+I0110 19:13:37.154614 32604 caffe.cpp:314] Batch 130, accuracy_5 = 0.76
+I0110 19:13:37.154628 32604 caffe.cpp:314] Batch 130, loss = 2.03112
+I0110 19:13:39.829381 32604 caffe.cpp:314] Batch 131, accuracy = 0.565
+I0110 19:13:39.829449 32604 caffe.cpp:314] Batch 131, accuracy_5 = 0.785
+I0110 19:13:39.829463 32604 caffe.cpp:314] Batch 131, loss = 1.77706
+I0110 19:13:42.641515 32604 caffe.cpp:314] Batch 132, accuracy = 0.54
+I0110 19:13:42.641582 32604 caffe.cpp:314] Batch 132, accuracy_5 = 0.795
+I0110 19:13:42.641595 32604 caffe.cpp:314] Batch 132, loss = 1.83056
+I0110 19:13:45.521332 32604 caffe.cpp:314] Batch 133, accuracy = 0.57
+I0110 19:13:45.521399 32604 caffe.cpp:314] Batch 133, accuracy_5 = 0.8
+I0110 19:13:45.521411 32604 caffe.cpp:314] Batch 133, loss = 1.96257
+I0110 19:13:48.822378 32604 caffe.cpp:314] Batch 134, accuracy = 0.595
+I0110 19:13:48.822439 32604 caffe.cpp:314] Batch 134, accuracy_5 = 0.82
+I0110 19:13:48.822453 32604 caffe.cpp:314] Batch 134, loss = 1.78797
+I0110 19:13:51.379379 32604 caffe.cpp:314] Batch 135, accuracy = 0.545
+I0110 19:13:51.379443 32604 caffe.cpp:314] Batch 135, accuracy_5 = 0.79
+I0110 19:13:51.379456 32604 caffe.cpp:314] Batch 135, loss = 1.83852
+I0110 19:13:54.179200 32604 caffe.cpp:314] Batch 136, accuracy = 0.615
+I0110 19:13:54.179280 32604 caffe.cpp:314] Batch 136, accuracy_5 = 0.84
+I0110 19:13:54.179294 32604 caffe.cpp:314] Batch 136, loss = 1.62292
+I0110 19:13:57.024425 32604 caffe.cpp:314] Batch 137, accuracy = 0.585
+I0110 19:13:57.024488 32604 caffe.cpp:314] Batch 137, accuracy_5 = 0.825
+I0110 19:13:57.024502 32604 caffe.cpp:314] Batch 137, loss = 1.77357
+I0110 19:13:59.550894 32604 caffe.cpp:314] Batch 138, accuracy = 0.56
+I0110 19:13:59.551358 32604 caffe.cpp:314] Batch 138, accuracy_5 = 0.825
+I0110 19:13:59.551381 32604 caffe.cpp:314] Batch 138, loss = 1.74019
+I0110 19:14:02.675150 32604 caffe.cpp:314] Batch 139, accuracy = 0.565
+I0110 19:14:02.675251 32604 caffe.cpp:314] Batch 139, accuracy_5 = 0.795
+I0110 19:14:02.675268 32604 caffe.cpp:314] Batch 139, loss = 1.83519
+I0110 19:14:06.804107 32604 caffe.cpp:314] Batch 140, accuracy = 0.6
+I0110 19:14:06.804178 32604 caffe.cpp:314] Batch 140, accuracy_5 = 0.795
+I0110 19:14:06.804193 32604 caffe.cpp:314] Batch 140, loss = 1.77667
+I0110 19:14:10.021205 32604 caffe.cpp:314] Batch 141, accuracy = 0.58
+I0110 19:14:10.021268 32604 caffe.cpp:314] Batch 141, accuracy_5 = 0.785
+I0110 19:14:10.021281 32604 caffe.cpp:314] Batch 141, loss = 2.00097
+I0110 19:14:13.626125 32604 caffe.cpp:314] Batch 142, accuracy = 0.53
+I0110 19:14:13.626179 32604 caffe.cpp:314] Batch 142, accuracy_5 = 0.825
+I0110 19:14:13.626193 32604 caffe.cpp:314] Batch 142, loss = 1.86813
+I0110 19:14:16.459903 32604 caffe.cpp:314] Batch 143, accuracy = 0.59
+I0110 19:14:16.459962 32604 caffe.cpp:314] Batch 143, accuracy_5 = 0.8
+I0110 19:14:16.459975 32604 caffe.cpp:314] Batch 143, loss = 1.78202
+I0110 19:14:19.061251 32604 caffe.cpp:314] Batch 144, accuracy = 0.56
+I0110 19:14:19.061363 32604 caffe.cpp:314] Batch 144, accuracy_5 = 0.775
+I0110 19:14:19.061377 32604 caffe.cpp:314] Batch 144, loss = 1.88729
+I0110 19:14:21.911784 32604 caffe.cpp:314] Batch 145, accuracy = 0.55
+I0110 19:14:21.911881 32604 caffe.cpp:314] Batch 145, accuracy_5 = 0.77
+I0110 19:14:21.911895 32604 caffe.cpp:314] Batch 145, loss = 1.9836
+I0110 19:14:24.466621 32604 caffe.cpp:314] Batch 146, accuracy = 0.585
+I0110 19:14:24.466742 32604 caffe.cpp:314] Batch 146, accuracy_5 = 0.75
+I0110 19:14:24.466755 32604 caffe.cpp:314] Batch 146, loss = 2.13686
+I0110 19:14:27.044229 32604 caffe.cpp:314] Batch 147, accuracy = 0.615
+I0110 19:14:27.044337 32604 caffe.cpp:314] Batch 147, accuracy_5 = 0.81
+I0110 19:14:27.044350 32604 caffe.cpp:314] Batch 147, loss = 1.76678
+I0110 19:14:29.627490 32604 caffe.cpp:314] Batch 148, accuracy = 0.59
+I0110 19:14:29.628011 32604 caffe.cpp:314] Batch 148, accuracy_5 = 0.84
+I0110 19:14:29.628031 32604 caffe.cpp:314] Batch 148, loss = 1.66734
+I0110 19:14:32.286964 32604 caffe.cpp:314] Batch 149, accuracy = 0.585
+I0110 19:14:32.287027 32604 caffe.cpp:314] Batch 149, accuracy_5 = 0.8
+I0110 19:14:32.287041 32604 caffe.cpp:314] Batch 149, loss = 1.70008
+I0110 19:14:34.552734 32604 caffe.cpp:314] Batch 150, accuracy = 0.56
+I0110 19:14:34.552798 32604 caffe.cpp:314] Batch 150, accuracy_5 = 0.79
+I0110 19:14:34.552810 32604 caffe.cpp:314] Batch 150, loss = 2.02995
+I0110 19:14:37.229313 32604 caffe.cpp:314] Batch 151, accuracy = 0.62
+I0110 19:14:37.229418 32604 caffe.cpp:314] Batch 151, accuracy_5 = 0.835
+I0110 19:14:37.229430 32604 caffe.cpp:314] Batch 151, loss = 1.48487
+I0110 19:14:39.858808 32604 caffe.cpp:314] Batch 152, accuracy = 0.535
+I0110 19:14:39.858907 32604 caffe.cpp:314] Batch 152, accuracy_5 = 0.77
+I0110 19:14:39.858920 32604 caffe.cpp:314] Batch 152, loss = 1.82699
+I0110 19:14:42.287422 32604 caffe.cpp:314] Batch 153, accuracy = 0.575
+I0110 19:14:42.287528 32604 caffe.cpp:314] Batch 153, accuracy_5 = 0.805
+I0110 19:14:42.287541 32604 caffe.cpp:314] Batch 153, loss = 1.78011
+I0110 19:14:45.112511 32604 caffe.cpp:314] Batch 154, accuracy = 0.575
+I0110 19:14:45.112607 32604 caffe.cpp:314] Batch 154, accuracy_5 = 0.78
+I0110 19:14:45.112622 32604 caffe.cpp:314] Batch 154, loss = 1.87286
+I0110 19:14:47.567518 32604 caffe.cpp:314] Batch 155, accuracy = 0.61
+I0110 19:14:47.567601 32604 caffe.cpp:314] Batch 155, accuracy_5 = 0.795
+I0110 19:14:47.567615 32604 caffe.cpp:314] Batch 155, loss = 1.83896
+I0110 19:14:50.393470 32604 caffe.cpp:314] Batch 156, accuracy = 0.505
+I0110 19:14:50.393568 32604 caffe.cpp:314] Batch 156, accuracy_5 = 0.78
+I0110 19:14:50.393581 32604 caffe.cpp:314] Batch 156, loss = 2.15649
+I0110 19:14:52.934725 32604 caffe.cpp:314] Batch 157, accuracy = 0.545
+I0110 19:14:52.934818 32604 caffe.cpp:314] Batch 157, accuracy_5 = 0.815
+I0110 19:14:52.934830 32604 caffe.cpp:314] Batch 157, loss = 1.76739
+I0110 19:14:55.549533 32604 caffe.cpp:314] Batch 158, accuracy = 0.58
+I0110 19:14:55.549657 32604 caffe.cpp:314] Batch 158, accuracy_5 = 0.79
+I0110 19:14:55.549671 32604 caffe.cpp:314] Batch 158, loss = 1.79059
+I0110 19:14:58.414070 32604 caffe.cpp:314] Batch 159, accuracy = 0.585
+I0110 19:14:58.414163 32604 caffe.cpp:314] Batch 159, accuracy_5 = 0.855
+I0110 19:14:58.414177 32604 caffe.cpp:314] Batch 159, loss = 1.67468
+I0110 19:15:02.292359 32604 caffe.cpp:314] Batch 160, accuracy = 0.6
+I0110 19:15:02.292963 32604 caffe.cpp:314] Batch 160, accuracy_5 = 0.845
+I0110 19:15:02.292982 32604 caffe.cpp:314] Batch 160, loss = 1.73536
+I0110 19:15:05.327385 32604 caffe.cpp:314] Batch 161, accuracy = 0.55
+I0110 19:15:05.327488 32604 caffe.cpp:314] Batch 161, accuracy_5 = 0.8
+I0110 19:15:05.327502 32604 caffe.cpp:314] Batch 161, loss = 1.95771
+I0110 19:15:08.032057 32604 caffe.cpp:314] Batch 162, accuracy = 0.615
+I0110 19:15:08.032126 32604 caffe.cpp:314] Batch 162, accuracy_5 = 0.825
+I0110 19:15:08.032140 32604 caffe.cpp:314] Batch 162, loss = 1.54446
+I0110 19:15:10.111905 32604 caffe.cpp:314] Batch 163, accuracy = 0.53
+I0110 19:15:10.111971 32604 caffe.cpp:314] Batch 163, accuracy_5 = 0.79
+I0110 19:15:10.111984 32604 caffe.cpp:314] Batch 163, loss = 1.92385
+I0110 19:15:13.067590 32604 caffe.cpp:314] Batch 164, accuracy = 0.595
+I0110 19:15:13.067656 32604 caffe.cpp:314] Batch 164, accuracy_5 = 0.855
+I0110 19:15:13.067672 32604 caffe.cpp:314] Batch 164, loss = 1.73281
+I0110 19:15:19.088263 32604 caffe.cpp:314] Batch 165, accuracy = 0.565
+I0110 19:15:19.088382 32604 caffe.cpp:314] Batch 165, accuracy_5 = 0.8
+I0110 19:15:19.088397 32604 caffe.cpp:314] Batch 165, loss = 1.83971
+I0110 19:15:23.861268 32604 caffe.cpp:314] Batch 166, accuracy = 0.555
+I0110 19:15:23.861336 32604 caffe.cpp:314] Batch 166, accuracy_5 = 0.795
+I0110 19:15:23.861349 32604 caffe.cpp:314] Batch 166, loss = 1.97802
+I0110 19:15:28.465155 32604 caffe.cpp:314] Batch 167, accuracy = 0.57
+I0110 19:15:28.465241 32604 caffe.cpp:314] Batch 167, accuracy_5 = 0.825
+I0110 19:15:28.465255 32604 caffe.cpp:314] Batch 167, loss = 1.62124
+I0110 19:15:32.746884 32604 caffe.cpp:314] Batch 168, accuracy = 0.615
+I0110 19:15:32.747159 32604 caffe.cpp:314] Batch 168, accuracy_5 = 0.82
+I0110 19:15:32.747184 32604 caffe.cpp:314] Batch 168, loss = 1.7797
+I0110 19:15:35.842619 32604 caffe.cpp:314] Batch 169, accuracy = 0.55
+I0110 19:15:35.842739 32604 caffe.cpp:314] Batch 169, accuracy_5 = 0.775
+I0110 19:15:35.842752 32604 caffe.cpp:314] Batch 169, loss = 1.97673
+I0110 19:15:38.975234 32604 caffe.cpp:314] Batch 170, accuracy = 0.59
+I0110 19:15:38.975345 32604 caffe.cpp:314] Batch 170, accuracy_5 = 0.78
+I0110 19:15:38.975359 32604 caffe.cpp:314] Batch 170, loss = 1.83342
+I0110 19:15:42.101757 32604 caffe.cpp:314] Batch 171, accuracy = 0.585
+I0110 19:15:42.101848 32604 caffe.cpp:314] Batch 171, accuracy_5 = 0.78
+I0110 19:15:42.101861 32604 caffe.cpp:314] Batch 171, loss = 1.82129
+I0110 19:15:45.277367 32604 caffe.cpp:314] Batch 172, accuracy = 0.58
+I0110 19:15:45.277479 32604 caffe.cpp:314] Batch 172, accuracy_5 = 0.8
+I0110 19:15:45.277493 32604 caffe.cpp:314] Batch 172, loss = 1.87014
+I0110 19:15:48.446318 32604 caffe.cpp:314] Batch 173, accuracy = 0.615
+I0110 19:15:48.446415 32604 caffe.cpp:314] Batch 173, accuracy_5 = 0.83
+I0110 19:15:48.446432 32604 caffe.cpp:314] Batch 173, loss = 1.58799
+I0110 19:15:51.523404 32604 caffe.cpp:314] Batch 174, accuracy = 0.655
+I0110 19:15:51.523488 32604 caffe.cpp:314] Batch 174, accuracy_5 = 0.845
+I0110 19:15:51.523501 32604 caffe.cpp:314] Batch 174, loss = 1.52592
+I0110 19:15:54.503207 32604 caffe.cpp:314] Batch 175, accuracy = 0.64
+I0110 19:15:54.503270 32604 caffe.cpp:314] Batch 175, accuracy_5 = 0.835
+I0110 19:15:54.503286 32604 caffe.cpp:314] Batch 175, loss = 1.58722
+I0110 19:15:57.283073 32604 caffe.cpp:314] Batch 176, accuracy = 0.535
+I0110 19:15:57.283131 32604 caffe.cpp:314] Batch 176, accuracy_5 = 0.78
+I0110 19:15:57.283145 32604 caffe.cpp:314] Batch 176, loss = 1.96951
+I0110 19:16:00.618883 32604 caffe.cpp:314] Batch 177, accuracy = 0.595
+I0110 19:16:00.618952 32604 caffe.cpp:314] Batch 177, accuracy_5 = 0.825
+I0110 19:16:00.618970 32604 caffe.cpp:314] Batch 177, loss = 1.79313
+I0110 19:16:03.847682 32604 caffe.cpp:314] Batch 178, accuracy = 0.555
+I0110 19:16:03.848269 32604 caffe.cpp:314] Batch 178, accuracy_5 = 0.845
+I0110 19:16:03.848296 32604 caffe.cpp:314] Batch 178, loss = 1.83633
+I0110 19:16:06.863765 32604 caffe.cpp:314] Batch 179, accuracy = 0.555
+I0110 19:16:06.863880 32604 caffe.cpp:314] Batch 179, accuracy_5 = 0.805
+I0110 19:16:06.863893 32604 caffe.cpp:314] Batch 179, loss = 1.90714
+I0110 19:16:09.867964 32604 caffe.cpp:314] Batch 180, accuracy = 0.525
+I0110 19:16:09.868031 32604 caffe.cpp:314] Batch 180, accuracy_5 = 0.845
+I0110 19:16:09.868043 32604 caffe.cpp:314] Batch 180, loss = 1.81016
+I0110 19:16:12.837802 32604 caffe.cpp:314] Batch 181, accuracy = 0.575
+I0110 19:16:12.837860 32604 caffe.cpp:314] Batch 181, accuracy_5 = 0.805
+I0110 19:16:12.837877 32604 caffe.cpp:314] Batch 181, loss = 1.8152
+I0110 19:16:15.964903 32604 caffe.cpp:314] Batch 182, accuracy = 0.575
+I0110 19:16:15.964960 32604 caffe.cpp:314] Batch 182, accuracy_5 = 0.835
+I0110 19:16:15.964974 32604 caffe.cpp:314] Batch 182, loss = 1.66304
+I0110 19:16:19.071480 32604 caffe.cpp:314] Batch 183, accuracy = 0.605
+I0110 19:16:19.071593 32604 caffe.cpp:314] Batch 183, accuracy_5 = 0.825
+I0110 19:16:19.071606 32604 caffe.cpp:314] Batch 183, loss = 1.72105
+I0110 19:16:21.913810 32604 caffe.cpp:314] Batch 184, accuracy = 0.635
+I0110 19:16:21.913873 32604 caffe.cpp:314] Batch 184, accuracy_5 = 0.81
+I0110 19:16:21.913890 32604 caffe.cpp:314] Batch 184, loss = 1.65256
+I0110 19:16:24.620611 32604 caffe.cpp:314] Batch 185, accuracy = 0.59
+I0110 19:16:24.620710 32604 caffe.cpp:314] Batch 185, accuracy_5 = 0.8
+I0110 19:16:24.620724 32604 caffe.cpp:314] Batch 185, loss = 1.77825
+I0110 19:16:27.607193 32604 caffe.cpp:314] Batch 186, accuracy = 0.575
+I0110 19:16:27.607307 32604 caffe.cpp:314] Batch 186, accuracy_5 = 0.815
+I0110 19:16:27.607321 32604 caffe.cpp:314] Batch 186, loss = 1.76327
+I0110 19:16:30.564944 32604 caffe.cpp:314] Batch 187, accuracy = 0.565
+I0110 19:16:30.565002 32604 caffe.cpp:314] Batch 187, accuracy_5 = 0.805
+I0110 19:16:30.565016 32604 caffe.cpp:314] Batch 187, loss = 1.85854
+I0110 19:16:33.505045 32604 caffe.cpp:314] Batch 188, accuracy = 0.655
+I0110 19:16:33.505105 32604 caffe.cpp:314] Batch 188, accuracy_5 = 0.84
+I0110 19:16:33.505121 32604 caffe.cpp:314] Batch 188, loss = 1.5826
+I0110 19:16:36.600416 32604 caffe.cpp:314] Batch 189, accuracy = 0.605
+I0110 19:16:36.600741 32604 caffe.cpp:314] Batch 189, accuracy_5 = 0.835
+I0110 19:16:36.600757 32604 caffe.cpp:314] Batch 189, loss = 1.60567
+I0110 19:16:39.927142 32604 caffe.cpp:314] Batch 190, accuracy = 0.605
+I0110 19:16:39.927260 32604 caffe.cpp:314] Batch 190, accuracy_5 = 0.8
+I0110 19:16:39.927274 32604 caffe.cpp:314] Batch 190, loss = 1.82896
+I0110 19:16:43.149456 32604 caffe.cpp:314] Batch 191, accuracy = 0.61
+I0110 19:16:43.149575 32604 caffe.cpp:314] Batch 191, accuracy_5 = 0.825
+I0110 19:16:43.149588 32604 caffe.cpp:314] Batch 191, loss = 1.66815
+I0110 19:16:46.139734 32604 caffe.cpp:314] Batch 192, accuracy = 0.55
+I0110 19:16:46.139849 32604 caffe.cpp:314] Batch 192, accuracy_5 = 0.815
+I0110 19:16:46.139863 32604 caffe.cpp:314] Batch 192, loss = 1.90631
+I0110 19:16:49.218186 32604 caffe.cpp:314] Batch 193, accuracy = 0.57
+I0110 19:16:49.218308 32604 caffe.cpp:314] Batch 193, accuracy_5 = 0.83
+I0110 19:16:49.218322 32604 caffe.cpp:314] Batch 193, loss = 1.73084
+I0110 19:16:52.143636 32604 caffe.cpp:314] Batch 194, accuracy = 0.58
+I0110 19:16:52.143693 32604 caffe.cpp:314] Batch 194, accuracy_5 = 0.805
+I0110 19:16:52.143707 32604 caffe.cpp:314] Batch 194, loss = 1.80687
+I0110 19:16:54.803546 32604 caffe.cpp:314] Batch 195, accuracy = 0.515
+I0110 19:16:54.803602 32604 caffe.cpp:314] Batch 195, accuracy_5 = 0.785
+I0110 19:16:54.803618 32604 caffe.cpp:314] Batch 195, loss = 1.9684
+I0110 19:16:57.225265 32604 caffe.cpp:314] Batch 196, accuracy = 0.57
+I0110 19:16:57.225329 32604 caffe.cpp:314] Batch 196, accuracy_5 = 0.825
+I0110 19:16:57.225345 32604 caffe.cpp:314] Batch 196, loss = 1.7384
+I0110 19:17:00.126936 32604 caffe.cpp:314] Batch 197, accuracy = 0.58
+I0110 19:17:00.127014 32604 caffe.cpp:314] Batch 197, accuracy_5 = 0.85
+I0110 19:17:00.127030 32604 caffe.cpp:314] Batch 197, loss = 1.54162
+I0110 19:17:02.827123 32604 caffe.cpp:314] Batch 198, accuracy = 0.59
+I0110 19:17:02.827189 32604 caffe.cpp:314] Batch 198, accuracy_5 = 0.81
+I0110 19:17:02.827206 32604 caffe.cpp:314] Batch 198, loss = 1.79786
+I0110 19:17:06.006597 32604 caffe.cpp:314] Batch 199, accuracy = 0.565
+I0110 19:17:06.006665 32604 caffe.cpp:314] Batch 199, accuracy_5 = 0.785
+I0110 19:17:06.006681 32604 caffe.cpp:314] Batch 199, loss = 1.92596
+I0110 19:17:09.260807 32604 caffe.cpp:314] Batch 200, accuracy = 0.61
+I0110 19:17:09.261230 32604 caffe.cpp:314] Batch 200, accuracy_5 = 0.805
+I0110 19:17:09.261253 32604 caffe.cpp:314] Batch 200, loss = 1.75285
+I0110 19:17:12.259297 32604 caffe.cpp:314] Batch 201, accuracy = 0.61
+I0110 19:17:12.259415 32604 caffe.cpp:314] Batch 201, accuracy_5 = 0.78
+I0110 19:17:12.259429 32604 caffe.cpp:314] Batch 201, loss = 1.84133
+I0110 19:17:15.045099 32604 caffe.cpp:314] Batch 202, accuracy = 0.545
+I0110 19:17:15.045215 32604 caffe.cpp:314] Batch 202, accuracy_5 = 0.795
+I0110 19:17:15.045229 32604 caffe.cpp:314] Batch 202, loss = 1.83155
+I0110 19:17:18.338495 32604 caffe.cpp:314] Batch 203, accuracy = 0.545
+I0110 19:17:18.338562 32604 caffe.cpp:314] Batch 203, accuracy_5 = 0.805
+I0110 19:17:18.338574 32604 caffe.cpp:314] Batch 203, loss = 1.83974
+I0110 19:17:21.027961 32604 caffe.cpp:314] Batch 204, accuracy = 0.585
+I0110 19:17:21.028061 32604 caffe.cpp:314] Batch 204, accuracy_5 = 0.84
+I0110 19:17:21.028077 32604 caffe.cpp:314] Batch 204, loss = 1.7443
+I0110 19:17:23.502946 32604 caffe.cpp:314] Batch 205, accuracy = 0.535
+I0110 19:17:23.503062 32604 caffe.cpp:314] Batch 205, accuracy_5 = 0.77
+I0110 19:17:23.503077 32604 caffe.cpp:314] Batch 205, loss = 2.0015
+I0110 19:17:26.282794 32604 caffe.cpp:314] Batch 206, accuracy = 0.59
+I0110 19:17:26.282860 32604 caffe.cpp:314] Batch 206, accuracy_5 = 0.835
+I0110 19:17:26.282872 32604 caffe.cpp:314] Batch 206, loss = 1.6601
+I0110 19:17:28.578866 32604 caffe.cpp:314] Batch 207, accuracy = 0.625
+I0110 19:17:28.578933 32604 caffe.cpp:314] Batch 207, accuracy_5 = 0.82
+I0110 19:17:28.578953 32604 caffe.cpp:314] Batch 207, loss = 1.68429
+I0110 19:17:30.959619 32604 caffe.cpp:314] Batch 208, accuracy = 0.59
+I0110 19:17:30.959734 32604 caffe.cpp:314] Batch 208, accuracy_5 = 0.815
+I0110 19:17:30.959748 32604 caffe.cpp:314] Batch 208, loss = 1.86848
+I0110 19:17:33.181259 32604 caffe.cpp:314] Batch 209, accuracy = 0.61
+I0110 19:17:33.181325 32604 caffe.cpp:314] Batch 209, accuracy_5 = 0.79
+I0110 19:17:33.181339 32604 caffe.cpp:314] Batch 209, loss = 1.75183
+I0110 19:17:35.787209 32604 caffe.cpp:314] Batch 210, accuracy = 0.515
+I0110 19:17:35.787272 32604 caffe.cpp:314] Batch 210, accuracy_5 = 0.805
+I0110 19:17:35.787286 32604 caffe.cpp:314] Batch 210, loss = 1.97728
+I0110 19:17:38.609529 32604 caffe.cpp:314] Batch 211, accuracy = 0.51
+I0110 19:17:38.609637 32604 caffe.cpp:314] Batch 211, accuracy_5 = 0.775
+I0110 19:17:38.609653 32604 caffe.cpp:314] Batch 211, loss = 1.94934
+I0110 19:17:41.323773 32604 caffe.cpp:314] Batch 212, accuracy = 0.615
+I0110 19:17:41.324141 32604 caffe.cpp:314] Batch 212, accuracy_5 = 0.835
+I0110 19:17:41.324160 32604 caffe.cpp:314] Batch 212, loss = 1.7089
+I0110 19:17:44.051489 32604 caffe.cpp:314] Batch 213, accuracy = 0.575
+I0110 19:17:44.051549 32604 caffe.cpp:314] Batch 213, accuracy_5 = 0.84
+I0110 19:17:44.051563 32604 caffe.cpp:314] Batch 213, loss = 1.64118
+I0110 19:17:46.747870 32604 caffe.cpp:314] Batch 214, accuracy = 0.59
+I0110 19:17:46.747982 32604 caffe.cpp:314] Batch 214, accuracy_5 = 0.805
+I0110 19:17:46.747995 32604 caffe.cpp:314] Batch 214, loss = 1.72182
+I0110 19:17:49.419643 32604 caffe.cpp:314] Batch 215, accuracy = 0.55
+I0110 19:17:49.419757 32604 caffe.cpp:314] Batch 215, accuracy_5 = 0.81
+I0110 19:17:49.419771 32604 caffe.cpp:314] Batch 215, loss = 1.87112
+I0110 19:17:51.969427 32604 caffe.cpp:314] Batch 216, accuracy = 0.515
+I0110 19:17:51.969542 32604 caffe.cpp:314] Batch 216, accuracy_5 = 0.77
+I0110 19:17:51.969554 32604 caffe.cpp:314] Batch 216, loss = 2.00468
+I0110 19:17:54.366258 32604 caffe.cpp:314] Batch 217, accuracy = 0.6
+I0110 19:17:54.366322 32604 caffe.cpp:314] Batch 217, accuracy_5 = 0.81
+I0110 19:17:54.366339 32604 caffe.cpp:314] Batch 217, loss = 1.80732
+I0110 19:17:57.119242 32604 caffe.cpp:314] Batch 218, accuracy = 0.54
+I0110 19:17:57.119305 32604 caffe.cpp:314] Batch 218, accuracy_5 = 0.82
+I0110 19:17:57.119321 32604 caffe.cpp:314] Batch 218, loss = 1.88061
+I0110 19:17:59.887900 32604 caffe.cpp:314] Batch 219, accuracy = 0.565
+I0110 19:17:59.888016 32604 caffe.cpp:314] Batch 219, accuracy_5 = 0.795
+I0110 19:17:59.888029 32604 caffe.cpp:314] Batch 219, loss = 1.88688
+I0110 19:18:02.786178 32604 caffe.cpp:314] Batch 220, accuracy = 0.595
+I0110 19:18:02.786281 32604 caffe.cpp:314] Batch 220, accuracy_5 = 0.75
+I0110 19:18:02.786298 32604 caffe.cpp:314] Batch 220, loss = 1.76853
+I0110 19:18:05.583411 32604 caffe.cpp:314] Batch 221, accuracy = 0.555
+I0110 19:18:05.583528 32604 caffe.cpp:314] Batch 221, accuracy_5 = 0.815
+I0110 19:18:05.583542 32604 caffe.cpp:314] Batch 221, loss = 1.91454
+I0110 19:18:08.505877 32604 caffe.cpp:314] Batch 222, accuracy = 0.51
+I0110 19:18:08.505975 32604 caffe.cpp:314] Batch 222, accuracy_5 = 0.76
+I0110 19:18:08.505988 32604 caffe.cpp:314] Batch 222, loss = 2.21266
+I0110 19:18:11.320644 32604 caffe.cpp:314] Batch 223, accuracy = 0.635
+I0110 19:18:11.320766 32604 caffe.cpp:314] Batch 223, accuracy_5 = 0.835
+I0110 19:18:11.320780 32604 caffe.cpp:314] Batch 223, loss = 1.70046
+I0110 19:18:13.890347 32604 caffe.cpp:314] Batch 224, accuracy = 0.58
+I0110 19:18:13.890764 32604 caffe.cpp:314] Batch 224, accuracy_5 = 0.83
+I0110 19:18:13.890786 32604 caffe.cpp:314] Batch 224, loss = 1.77932
+I0110 19:18:16.372701 32604 caffe.cpp:314] Batch 225, accuracy = 0.605
+I0110 19:18:16.372822 32604 caffe.cpp:314] Batch 225, accuracy_5 = 0.855
+I0110 19:18:16.372835 32604 caffe.cpp:314] Batch 225, loss = 1.61237
+I0110 19:18:18.789338 32604 caffe.cpp:314] Batch 226, accuracy = 0.605
+I0110 19:18:18.789453 32604 caffe.cpp:314] Batch 226, accuracy_5 = 0.845
+I0110 19:18:18.789465 32604 caffe.cpp:314] Batch 226, loss = 1.68577
+I0110 19:18:21.715489 32604 caffe.cpp:314] Batch 227, accuracy = 0.515
+I0110 19:18:21.715618 32604 caffe.cpp:314] Batch 227, accuracy_5 = 0.755
+I0110 19:18:21.715631 32604 caffe.cpp:314] Batch 227, loss = 2.09912
+I0110 19:18:24.365905 32604 caffe.cpp:314] Batch 228, accuracy = 0.56
+I0110 19:18:24.366026 32604 caffe.cpp:314] Batch 228, accuracy_5 = 0.79
+I0110 19:18:24.366040 32604 caffe.cpp:314] Batch 228, loss = 1.83753
+I0110 19:18:27.454843 32604 caffe.cpp:314] Batch 229, accuracy = 0.545
+I0110 19:18:27.454910 32604 caffe.cpp:314] Batch 229, accuracy_5 = 0.81
+I0110 19:18:27.454927 32604 caffe.cpp:314] Batch 229, loss = 1.89739
+I0110 19:18:29.909090 32604 caffe.cpp:314] Batch 230, accuracy = 0.59
+I0110 19:18:29.909155 32604 caffe.cpp:314] Batch 230, accuracy_5 = 0.8
+I0110 19:18:29.909173 32604 caffe.cpp:314] Batch 230, loss = 1.86965
+I0110 19:18:33.178860 32604 caffe.cpp:314] Batch 231, accuracy = 0.575
+I0110 19:18:33.178989 32604 caffe.cpp:314] Batch 231, accuracy_5 = 0.775
+I0110 19:18:33.179004 32604 caffe.cpp:314] Batch 231, loss = 1.93108
+I0110 19:18:36.010076 32604 caffe.cpp:314] Batch 232, accuracy = 0.585
+I0110 19:18:36.010192 32604 caffe.cpp:314] Batch 232, accuracy_5 = 0.795
+I0110 19:18:36.010205 32604 caffe.cpp:314] Batch 232, loss = 1.71683
+I0110 19:18:38.851512 32604 caffe.cpp:314] Batch 233, accuracy = 0.555
+I0110 19:18:38.851634 32604 caffe.cpp:314] Batch 233, accuracy_5 = 0.785
+I0110 19:18:38.851646 32604 caffe.cpp:314] Batch 233, loss = 1.98323
+I0110 19:18:41.538131 32604 caffe.cpp:314] Batch 234, accuracy = 0.63
+I0110 19:18:41.538246 32604 caffe.cpp:314] Batch 234, accuracy_5 = 0.81
+I0110 19:18:41.538260 32604 caffe.cpp:314] Batch 234, loss = 1.66521
+I0110 19:18:44.655562 32604 caffe.cpp:314] Batch 235, accuracy = 0.61
+I0110 19:18:44.655901 32604 caffe.cpp:314] Batch 235, accuracy_5 = 0.8
+I0110 19:18:44.655918 32604 caffe.cpp:314] Batch 235, loss = 1.66541
+I0110 19:18:47.320974 32604 caffe.cpp:314] Batch 236, accuracy = 0.54
+I0110 19:18:47.321090 32604 caffe.cpp:314] Batch 236, accuracy_5 = 0.75
+I0110 19:18:47.321104 32604 caffe.cpp:314] Batch 236, loss = 2.06575
+I0110 19:18:50.656227 32604 caffe.cpp:314] Batch 237, accuracy = 0.575
+I0110 19:18:50.656343 32604 caffe.cpp:314] Batch 237, accuracy_5 = 0.825
+I0110 19:18:50.656357 32604 caffe.cpp:314] Batch 237, loss = 1.75534
+I0110 19:18:53.450316 32604 caffe.cpp:314] Batch 238, accuracy = 0.57
+I0110 19:18:53.450429 32604 caffe.cpp:314] Batch 238, accuracy_5 = 0.8
+I0110 19:18:53.450443 32604 caffe.cpp:314] Batch 238, loss = 1.80381
+I0110 19:18:56.127899 32604 caffe.cpp:314] Batch 239, accuracy = 0.55
+I0110 19:18:56.128006 32604 caffe.cpp:314] Batch 239, accuracy_5 = 0.78
+I0110 19:18:56.128020 32604 caffe.cpp:314] Batch 239, loss = 1.96692
+I0110 19:18:58.917115 32604 caffe.cpp:314] Batch 240, accuracy = 0.5
+I0110 19:18:58.917239 32604 caffe.cpp:314] Batch 240, accuracy_5 = 0.81
+I0110 19:18:58.917253 32604 caffe.cpp:314] Batch 240, loss = 1.99016
+I0110 19:19:01.928189 32604 caffe.cpp:314] Batch 241, accuracy = 0.53
+I0110 19:19:01.928302 32604 caffe.cpp:314] Batch 241, accuracy_5 = 0.77
+I0110 19:19:01.928315 32604 caffe.cpp:314] Batch 241, loss = 2.08109
+I0110 19:19:04.856820 32604 caffe.cpp:314] Batch 242, accuracy = 0.6
+I0110 19:19:04.856932 32604 caffe.cpp:314] Batch 242, accuracy_5 = 0.815
+I0110 19:19:04.856945 32604 caffe.cpp:314] Batch 242, loss = 1.75638
+I0110 19:19:07.528403 32604 caffe.cpp:314] Batch 243, accuracy = 0.55
+I0110 19:19:07.528527 32604 caffe.cpp:314] Batch 243, accuracy_5 = 0.77
+I0110 19:19:07.528540 32604 caffe.cpp:314] Batch 243, loss = 2.01486
+I0110 19:19:10.748031 32604 caffe.cpp:314] Batch 244, accuracy = 0.565
+I0110 19:19:10.748129 32604 caffe.cpp:314] Batch 244, accuracy_5 = 0.82
+I0110 19:19:10.748142 32604 caffe.cpp:314] Batch 244, loss = 1.72987
+I0110 19:19:13.727145 32604 caffe.cpp:314] Batch 245, accuracy = 0.565
+I0110 19:19:13.727267 32604 caffe.cpp:314] Batch 245, accuracy_5 = 0.775
+I0110 19:19:13.727279 32604 caffe.cpp:314] Batch 245, loss = 1.99339
+I0110 19:19:16.432109 32604 caffe.cpp:314] Batch 246, accuracy = 0.59
+I0110 19:19:16.432464 32604 caffe.cpp:314] Batch 246, accuracy_5 = 0.815
+I0110 19:19:16.432481 32604 caffe.cpp:314] Batch 246, loss = 1.74304
+I0110 19:19:19.553563 32604 caffe.cpp:314] Batch 247, accuracy = 0.525
+I0110 19:19:19.553689 32604 caffe.cpp:314] Batch 247, accuracy_5 = 0.755
+I0110 19:19:19.553701 32604 caffe.cpp:314] Batch 247, loss = 2.20628
+I0110 19:19:22.437682 32604 caffe.cpp:314] Batch 248, accuracy = 0.535
+I0110 19:19:22.437777 32604 caffe.cpp:314] Batch 248, accuracy_5 = 0.78
+I0110 19:19:22.437791 32604 caffe.cpp:314] Batch 248, loss = 1.99643
+I0110 19:19:23.839903 32609 data_layer.cpp:73] Restarting data prefetching from start.
+I0110 19:19:25.461009 32604 caffe.cpp:314] Batch 249, accuracy = 0.625
+I0110 19:19:25.461122 32604 caffe.cpp:314] Batch 249, accuracy_5 = 0.825
+I0110 19:19:25.461139 32604 caffe.cpp:314] Batch 249, loss = 1.56611
+I0110 19:19:25.461150 32604 caffe.cpp:319] Loss: 1.80381
+I0110 19:19:25.461180 32604 caffe.cpp:332] accuracy = 0.57776
+I0110 19:19:25.461199 32604 caffe.cpp:332] accuracy_5 = 0.8077
+I0110 19:19:25.461216 32604 caffe.cpp:332] loss = 1.80381 (* 1 = 1.80381 loss)

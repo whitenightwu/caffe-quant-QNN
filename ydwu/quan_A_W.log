@@ -1,0 +1,224 @@
+  name: "acc_top1"
+  top: "acc_top1"
+  accuracy_param {
+  name: "acc_top5"
+  top: "acc_top5"
+  accuracy_param {
+I1220 10:49:10.071395   478 layer_factory.hpp:77] Creating layer acc_top1
+I1220 10:49:10.071408   478 net.cpp:84] Creating Layer acc_top1
+I1220 10:49:10.071415   478 net.cpp:406] acc_top1 <- quantized_fc8_quantized_fc8_0_split_2
+I1220 10:49:10.071424   478 net.cpp:406] acc_top1 <- label_data_1_split_1
+I1220 10:49:10.071432   478 net.cpp:380] acc_top1 -> acc_top1
+I1220 10:49:10.071449   478 net.cpp:122] Setting up acc_top1
+I1220 10:49:10.071470   478 layer_factory.hpp:77] Creating layer acc_top5
+I1220 10:49:10.071480   478 net.cpp:84] Creating Layer acc_top5
+I1220 10:49:10.071486   478 net.cpp:406] acc_top5 <- quantized_fc8_quantized_fc8_0_split_3
+I1220 10:49:10.071493   478 net.cpp:406] acc_top5 <- label_data_1_split_2
+I1220 10:49:10.071501   478 net.cpp:380] acc_top5 -> acc_top5
+I1220 10:49:10.071512   478 net.cpp:122] Setting up acc_top5
+I1220 10:49:10.071533   478 net.cpp:200] acc_top5 does not need backward computation.
+I1220 10:49:10.071540   478 net.cpp:200] acc_top1 does not need backward computation.
+I1220 10:49:10.071887   478 net.cpp:242] This network produces output acc_top1
+I1220 10:49:10.071894   478 net.cpp:242] This network produces output acc_top5
+I1220 10:49:13.243407   478 caffe.cpp:313] Batch 0, acc_top1 = 0.78
+I1220 10:49:13.243463   478 caffe.cpp:313] Batch 0, acc_top5 = 0.94
+I1220 10:49:14.270303   478 caffe.cpp:313] Batch 1, acc_top1 = 0.7
+I1220 10:49:14.270366   478 caffe.cpp:313] Batch 1, acc_top5 = 0.86
+I1220 10:49:15.308495   478 caffe.cpp:313] Batch 2, acc_top1 = 0.86
+I1220 10:49:15.308555   478 caffe.cpp:313] Batch 2, acc_top5 = 0.98
+I1220 10:49:16.357972   478 caffe.cpp:313] Batch 3, acc_top1 = 0.74
+I1220 10:49:16.358041   478 caffe.cpp:313] Batch 3, acc_top5 = 0.9
+I1220 10:49:17.407457   478 caffe.cpp:313] Batch 4, acc_top1 = 0.8
+I1220 10:49:17.407549   478 caffe.cpp:313] Batch 4, acc_top5 = 0.92
+I1220 10:49:18.499231   478 caffe.cpp:313] Batch 5, acc_top1 = 0.7
+I1220 10:49:18.499299   478 caffe.cpp:313] Batch 5, acc_top5 = 0.94
+I1220 10:49:19.586275   478 caffe.cpp:313] Batch 6, acc_top1 = 0.78
+I1220 10:49:19.586346   478 caffe.cpp:313] Batch 6, acc_top5 = 0.9
+I1220 10:49:20.615728   478 caffe.cpp:313] Batch 7, acc_top1 = 0.8
+I1220 10:49:20.615802   478 caffe.cpp:313] Batch 7, acc_top5 = 0.94
+I1220 10:49:21.722463   478 caffe.cpp:313] Batch 8, acc_top1 = 0.84
+I1220 10:49:21.722532   478 caffe.cpp:313] Batch 8, acc_top5 = 0.9
+I1220 10:49:22.811549   478 caffe.cpp:313] Batch 9, acc_top1 = 0.72
+I1220 10:49:22.811615   478 caffe.cpp:313] Batch 9, acc_top5 = 0.92
+I1220 10:49:23.951710   478 caffe.cpp:313] Batch 10, acc_top1 = 0.64
+I1220 10:49:23.951786   478 caffe.cpp:313] Batch 10, acc_top5 = 0.84
+I1220 10:49:25.042102   478 caffe.cpp:313] Batch 11, acc_top1 = 0.76
+I1220 10:49:25.042167   478 caffe.cpp:313] Batch 11, acc_top5 = 0.92
+I1220 10:49:26.132190   478 caffe.cpp:313] Batch 12, acc_top1 = 0.76
+I1220 10:49:26.132261   478 caffe.cpp:313] Batch 12, acc_top5 = 0.9
+I1220 10:49:27.220633   478 caffe.cpp:313] Batch 13, acc_top1 = 0.76
+I1220 10:49:27.220695   478 caffe.cpp:313] Batch 13, acc_top5 = 0.9
+I1220 10:49:28.310794   478 caffe.cpp:313] Batch 14, acc_top1 = 0.76
+I1220 10:49:28.310899   478 caffe.cpp:313] Batch 14, acc_top5 = 0.94
+I1220 10:49:29.395210   478 caffe.cpp:313] Batch 15, acc_top1 = 0.76
+I1220 10:49:29.395277   478 caffe.cpp:313] Batch 15, acc_top5 = 0.94
+I1220 10:49:30.483794   478 caffe.cpp:313] Batch 16, acc_top1 = 0.7
+I1220 10:49:30.483856   478 caffe.cpp:313] Batch 16, acc_top5 = 0.92
+I1220 10:49:31.576885   478 caffe.cpp:313] Batch 17, acc_top1 = 0.82
+I1220 10:49:31.576953   478 caffe.cpp:313] Batch 17, acc_top5 = 0.88
+I1220 10:49:32.659615   478 caffe.cpp:313] Batch 18, acc_top1 = 0.84
+I1220 10:49:32.659683   478 caffe.cpp:313] Batch 18, acc_top5 = 0.96
+I1220 10:49:33.681272   478 caffe.cpp:313] Batch 19, acc_top1 = 0.72
+I1220 10:49:33.681342   478 caffe.cpp:313] Batch 19, acc_top5 = 0.88
+I1220 10:49:34.764842   478 caffe.cpp:313] Batch 20, acc_top1 = 0.76
+I1220 10:49:34.764910   478 caffe.cpp:313] Batch 20, acc_top5 = 0.92
+I1220 10:49:35.847882   478 caffe.cpp:313] Batch 21, acc_top1 = 0.74
+I1220 10:49:35.847951   478 caffe.cpp:313] Batch 21, acc_top5 = 0.9
+I1220 10:49:36.880334   478 caffe.cpp:313] Batch 22, acc_top1 = 0.86
+I1220 10:49:36.880401   478 caffe.cpp:313] Batch 22, acc_top5 = 0.9
+I1220 10:49:37.901690   478 caffe.cpp:313] Batch 23, acc_top1 = 0.6
+I1220 10:49:37.901758   478 caffe.cpp:313] Batch 23, acc_top5 = 0.82
+I1220 10:49:38.921406   478 caffe.cpp:313] Batch 24, acc_top1 = 0.84
+I1220 10:49:38.921506   478 caffe.cpp:313] Batch 24, acc_top5 = 0.94
+I1220 10:49:40.016427   478 caffe.cpp:313] Batch 25, acc_top1 = 0.64
+I1220 10:49:40.016490   478 caffe.cpp:313] Batch 25, acc_top5 = 0.88
+I1220 10:49:41.117045   478 caffe.cpp:313] Batch 26, acc_top1 = 0.72
+I1220 10:49:41.117111   478 caffe.cpp:313] Batch 26, acc_top5 = 0.9
+I1220 10:49:42.208833   478 caffe.cpp:313] Batch 27, acc_top1 = 0.66
+I1220 10:49:42.208904   478 caffe.cpp:313] Batch 27, acc_top5 = 0.88
+I1220 10:49:43.300848   478 caffe.cpp:313] Batch 28, acc_top1 = 0.86
+I1220 10:49:43.300921   478 caffe.cpp:313] Batch 28, acc_top5 = 0.96
+I1220 10:49:44.392518   478 caffe.cpp:313] Batch 29, acc_top1 = 0.68
+I1220 10:49:44.392597   478 caffe.cpp:313] Batch 29, acc_top5 = 0.92
+I1220 10:49:45.500020   478 caffe.cpp:313] Batch 30, acc_top1 = 0.76
+I1220 10:49:45.500088   478 caffe.cpp:313] Batch 30, acc_top5 = 0.92
+I1220 10:49:46.588902   478 caffe.cpp:313] Batch 31, acc_top1 = 0.78
+I1220 10:49:46.588973   478 caffe.cpp:313] Batch 31, acc_top5 = 0.96
+I1220 10:49:47.619509   478 caffe.cpp:313] Batch 32, acc_top1 = 0.66
+I1220 10:49:47.619581   478 caffe.cpp:313] Batch 32, acc_top5 = 0.94
+I1220 10:49:48.649607   478 caffe.cpp:313] Batch 33, acc_top1 = 0.78
+I1220 10:49:48.649678   478 caffe.cpp:313] Batch 33, acc_top5 = 0.94
+I1220 10:49:49.680912   478 caffe.cpp:313] Batch 34, acc_top1 = 0.74
+I1220 10:49:49.680980   478 caffe.cpp:313] Batch 34, acc_top5 = 0.98
+I1220 10:49:50.712152   478 caffe.cpp:313] Batch 35, acc_top1 = 0.76
+I1220 10:49:50.712218   478 caffe.cpp:313] Batch 35, acc_top5 = 0.94
+I1220 10:49:51.743432   478 caffe.cpp:313] Batch 36, acc_top1 = 0.76
+I1220 10:49:51.743499   478 caffe.cpp:313] Batch 36, acc_top5 = 0.96
+I1220 10:49:52.834094   478 caffe.cpp:313] Batch 37, acc_top1 = 0.92
+I1220 10:49:52.834161   478 caffe.cpp:313] Batch 37, acc_top5 = 0.94
+I1220 10:49:53.924744   478 caffe.cpp:313] Batch 38, acc_top1 = 0.76
+I1220 10:49:53.924813   478 caffe.cpp:313] Batch 38, acc_top5 = 0.94
+I1220 10:49:55.013731   478 caffe.cpp:313] Batch 39, acc_top1 = 0.8
+I1220 10:49:55.013813   478 caffe.cpp:313] Batch 39, acc_top5 = 0.98
+I1220 10:49:56.122768   478 caffe.cpp:313] Batch 40, acc_top1 = 0.74
+I1220 10:49:56.122839   478 caffe.cpp:313] Batch 40, acc_top5 = 0.94
+I1220 10:49:57.208384   478 caffe.cpp:313] Batch 41, acc_top1 = 0.76
+I1220 10:49:57.208452   478 caffe.cpp:313] Batch 41, acc_top5 = 0.9
+I1220 10:49:58.301194   478 caffe.cpp:313] Batch 42, acc_top1 = 0.8
+I1220 10:49:58.301260   478 caffe.cpp:313] Batch 42, acc_top5 = 0.9
+I1220 10:49:59.393402   478 caffe.cpp:313] Batch 43, acc_top1 = 0.82
+I1220 10:49:59.393474   478 caffe.cpp:313] Batch 43, acc_top5 = 0.96
+I1220 10:50:00.426350   478 caffe.cpp:313] Batch 44, acc_top1 = 0.76
+I1220 10:50:00.426426   478 caffe.cpp:313] Batch 44, acc_top5 = 0.98
+I1220 10:50:01.540983   478 caffe.cpp:313] Batch 45, acc_top1 = 0.86
+I1220 10:50:01.541056   478 caffe.cpp:313] Batch 45, acc_top5 = 0.96
+I1220 10:50:02.628836   478 caffe.cpp:313] Batch 46, acc_top1 = 0.76
+I1220 10:50:02.628906   478 caffe.cpp:313] Batch 46, acc_top5 = 0.88
+I1220 10:50:03.659797   478 caffe.cpp:313] Batch 47, acc_top1 = 0.74
+I1220 10:50:03.659867   478 caffe.cpp:313] Batch 47, acc_top5 = 0.88
+I1220 10:50:04.692790   478 caffe.cpp:313] Batch 48, acc_top1 = 0.7
+I1220 10:50:04.692860   478 caffe.cpp:313] Batch 48, acc_top5 = 0.94
+I1220 10:50:05.725435   478 caffe.cpp:313] Batch 49, acc_top1 = 0.8
+I1220 10:50:05.725505   478 caffe.cpp:313] Batch 49, acc_top5 = 0.94
+I1220 10:50:06.805611   478 caffe.cpp:313] Batch 50, acc_top1 = 0.76
+I1220 10:50:06.805682   478 caffe.cpp:313] Batch 50, acc_top5 = 1
+I1220 10:50:07.891502   478 caffe.cpp:313] Batch 51, acc_top1 = 0.66
+I1220 10:50:07.891572   478 caffe.cpp:313] Batch 51, acc_top5 = 0.88
+I1220 10:50:08.982498   478 caffe.cpp:313] Batch 52, acc_top1 = 0.66
+I1220 10:50:08.982569   478 caffe.cpp:313] Batch 52, acc_top5 = 0.96
+I1220 10:50:10.076053   478 caffe.cpp:313] Batch 53, acc_top1 = 0.86
+I1220 10:50:10.076102   478 caffe.cpp:313] Batch 53, acc_top5 = 0.98
+I1220 10:50:11.163025   478 caffe.cpp:313] Batch 54, acc_top1 = 0.8
+I1220 10:50:11.163115   478 caffe.cpp:313] Batch 54, acc_top5 = 0.94
+I1220 10:50:12.250185   478 caffe.cpp:313] Batch 55, acc_top1 = 0.7
+I1220 10:50:12.250270   478 caffe.cpp:313] Batch 55, acc_top5 = 0.9
+I1220 10:50:13.341008   478 caffe.cpp:313] Batch 56, acc_top1 = 0.76
+I1220 10:50:13.341080   478 caffe.cpp:313] Batch 56, acc_top5 = 0.92
+I1220 10:50:14.433797   478 caffe.cpp:313] Batch 57, acc_top1 = 0.7
+I1220 10:50:14.433866   478 caffe.cpp:313] Batch 57, acc_top5 = 0.94
+I1220 10:50:15.539073   478 caffe.cpp:313] Batch 58, acc_top1 = 0.8
+I1220 10:50:15.539145   478 caffe.cpp:313] Batch 58, acc_top5 = 0.94
+I1220 10:50:16.631469   478 caffe.cpp:313] Batch 59, acc_top1 = 0.7
+I1220 10:50:16.631544   478 caffe.cpp:313] Batch 59, acc_top5 = 0.92
+I1220 10:50:17.724012   478 caffe.cpp:313] Batch 60, acc_top1 = 0.66
+I1220 10:50:17.724083   478 caffe.cpp:313] Batch 60, acc_top5 = 0.92
+I1220 10:50:18.812053   478 caffe.cpp:313] Batch 61, acc_top1 = 0.78
+I1220 10:50:18.812126   478 caffe.cpp:313] Batch 61, acc_top5 = 0.92
+I1220 10:50:19.841830   478 caffe.cpp:313] Batch 62, acc_top1 = 0.76
+I1220 10:50:19.841897   478 caffe.cpp:313] Batch 62, acc_top5 = 0.94
+I1220 10:50:20.929378   478 caffe.cpp:313] Batch 63, acc_top1 = 0.78
+I1220 10:50:20.929450   478 caffe.cpp:313] Batch 63, acc_top5 = 0.92
+I1220 10:50:22.020423   478 caffe.cpp:313] Batch 64, acc_top1 = 0.68
+I1220 10:50:22.020526   478 caffe.cpp:313] Batch 64, acc_top5 = 0.96
+I1220 10:50:23.112341   478 caffe.cpp:313] Batch 65, acc_top1 = 0.78
+I1220 10:50:23.112413   478 caffe.cpp:313] Batch 65, acc_top5 = 0.96
+I1220 10:50:24.203855   478 caffe.cpp:313] Batch 66, acc_top1 = 0.8
+I1220 10:50:24.203925   478 caffe.cpp:313] Batch 66, acc_top5 = 0.98
+I1220 10:50:25.295163   478 caffe.cpp:313] Batch 67, acc_top1 = 0.76
+I1220 10:50:25.295228   478 caffe.cpp:313] Batch 67, acc_top5 = 0.94
+I1220 10:50:26.387043   478 caffe.cpp:313] Batch 68, acc_top1 = 0.82
+I1220 10:50:26.387114   478 caffe.cpp:313] Batch 68, acc_top5 = 1
+I1220 10:50:27.478189   478 caffe.cpp:313] Batch 69, acc_top1 = 0.72
+I1220 10:50:27.478261   478 caffe.cpp:313] Batch 69, acc_top5 = 0.98
+I1220 10:50:28.569725   478 caffe.cpp:313] Batch 70, acc_top1 = 0.8
+I1220 10:50:28.569792   478 caffe.cpp:313] Batch 70, acc_top5 = 0.94
+I1220 10:50:29.660714   478 caffe.cpp:313] Batch 71, acc_top1 = 0.78
+I1220 10:50:29.660786   478 caffe.cpp:313] Batch 71, acc_top5 = 0.94
+I1220 10:50:30.746817   478 caffe.cpp:313] Batch 72, acc_top1 = 0.74
+I1220 10:50:30.746887   478 caffe.cpp:313] Batch 72, acc_top5 = 0.92
+I1220 10:50:31.832186   478 caffe.cpp:313] Batch 73, acc_top1 = 0.7
+I1220 10:50:31.832257   478 caffe.cpp:313] Batch 73, acc_top5 = 0.96
+I1220 10:50:32.922199   478 caffe.cpp:313] Batch 74, acc_top1 = 0.66
+I1220 10:50:32.922269   478 caffe.cpp:313] Batch 74, acc_top5 = 0.88
+I1220 10:50:34.004834   478 caffe.cpp:313] Batch 75, acc_top1 = 0.74
+I1220 10:50:34.004902   478 caffe.cpp:313] Batch 75, acc_top5 = 0.92
+I1220 10:50:35.088326   478 caffe.cpp:313] Batch 76, acc_top1 = 0.66
+I1220 10:50:35.088392   478 caffe.cpp:313] Batch 76, acc_top5 = 0.88
+I1220 10:50:36.164669   478 caffe.cpp:313] Batch 77, acc_top1 = 0.78
+I1220 10:50:36.164738   478 caffe.cpp:313] Batch 77, acc_top5 = 0.96
+I1220 10:50:37.239199   478 caffe.cpp:313] Batch 78, acc_top1 = 0.78
+I1220 10:50:37.239298   478 caffe.cpp:313] Batch 78, acc_top5 = 0.96
+I1220 10:50:38.321332   478 caffe.cpp:313] Batch 79, acc_top1 = 0.74
+I1220 10:50:38.321401   478 caffe.cpp:313] Batch 79, acc_top5 = 0.92
+I1220 10:50:39.416149   478 caffe.cpp:313] Batch 80, acc_top1 = 0.66
+I1220 10:50:39.416218   478 caffe.cpp:313] Batch 80, acc_top5 = 0.84
+I1220 10:50:40.510417   478 caffe.cpp:313] Batch 81, acc_top1 = 0.78
+I1220 10:50:40.510488   478 caffe.cpp:313] Batch 81, acc_top5 = 0.88
+I1220 10:50:41.613904   478 caffe.cpp:313] Batch 82, acc_top1 = 0.8
+I1220 10:50:41.613975   478 caffe.cpp:313] Batch 82, acc_top5 = 0.92
+I1220 10:50:42.705466   478 caffe.cpp:313] Batch 83, acc_top1 = 0.78
+I1220 10:50:42.705530   478 caffe.cpp:313] Batch 83, acc_top5 = 0.9
+I1220 10:50:43.789314   478 caffe.cpp:313] Batch 84, acc_top1 = 0.78
+I1220 10:50:43.789382   478 caffe.cpp:313] Batch 84, acc_top5 = 1
+I1220 10:50:44.870229   478 caffe.cpp:313] Batch 85, acc_top1 = 0.72
+I1220 10:50:44.870299   478 caffe.cpp:313] Batch 85, acc_top5 = 0.88
+I1220 10:50:45.945339   478 caffe.cpp:313] Batch 86, acc_top1 = 0.78
+I1220 10:50:45.945407   478 caffe.cpp:313] Batch 86, acc_top5 = 0.94
+I1220 10:50:46.963698   478 caffe.cpp:313] Batch 87, acc_top1 = 0.82
+I1220 10:50:46.963763   478 caffe.cpp:313] Batch 87, acc_top5 = 0.94
+I1220 10:50:47.980830   478 caffe.cpp:313] Batch 88, acc_top1 = 0.7
+I1220 10:50:47.980902   478 caffe.cpp:313] Batch 88, acc_top5 = 0.92
+I1220 10:50:49.064414   478 caffe.cpp:313] Batch 89, acc_top1 = 0.76
+I1220 10:50:49.064476   478 caffe.cpp:313] Batch 89, acc_top5 = 0.94
+I1220 10:50:50.157892   478 caffe.cpp:313] Batch 90, acc_top1 = 0.84
+I1220 10:50:50.157963   478 caffe.cpp:313] Batch 90, acc_top5 = 0.9
+I1220 10:50:51.250908   478 caffe.cpp:313] Batch 91, acc_top1 = 0.78
+I1220 10:50:51.250982   478 caffe.cpp:313] Batch 91, acc_top5 = 0.92
+I1220 10:50:52.338484   478 caffe.cpp:313] Batch 92, acc_top1 = 0.84
+I1220 10:50:52.338549   478 caffe.cpp:313] Batch 92, acc_top5 = 0.96
+I1220 10:50:53.438930   478 caffe.cpp:313] Batch 93, acc_top1 = 0.7
+I1220 10:50:53.439005   478 caffe.cpp:313] Batch 93, acc_top5 = 0.92
+I1220 10:50:54.531570   478 caffe.cpp:313] Batch 94, acc_top1 = 0.72
+I1220 10:50:54.531641   478 caffe.cpp:313] Batch 94, acc_top5 = 0.92
+I1220 10:50:55.623915   478 caffe.cpp:313] Batch 95, acc_top1 = 0.68
+I1220 10:50:55.623987   478 caffe.cpp:313] Batch 95, acc_top5 = 0.94
+I1220 10:50:56.716372   478 caffe.cpp:313] Batch 96, acc_top1 = 0.68
+I1220 10:50:56.716459   478 caffe.cpp:313] Batch 96, acc_top5 = 0.94
+I1220 10:50:57.807587   478 caffe.cpp:313] Batch 97, acc_top1 = 0.74
+I1220 10:50:57.807653   478 caffe.cpp:313] Batch 97, acc_top5 = 0.94
+I1220 10:50:58.901296   478 caffe.cpp:313] Batch 98, acc_top1 = 0.8
+I1220 10:50:58.901372   478 caffe.cpp:313] Batch 98, acc_top5 = 0.92
+I1220 10:50:59.994765   478 caffe.cpp:313] Batch 99, acc_top1 = 0.7
+I1220 10:50:59.994833   478 caffe.cpp:313] Batch 99, acc_top5 = 0.84
+I1220 10:51:00.386214   478 caffe.cpp:330] acc_top1 = 0.7544
+I1220 10:51:00.386229   478 caffe.cpp:330] acc_top5 = 0.9262

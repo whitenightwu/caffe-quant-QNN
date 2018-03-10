@@ -1,0 +1,35 @@
+net: "quan_train_val.prototxt"
+test_iter: 250
+test_interval: 10000
+base_lr: 0.0000001
+lr_policy: "multistep"
+gamma: 0.1
+#stepvalue: 6000
+stepvalue: 70000
+display: 50
+#max_iter: 78000
+max_iter: 162000
+momentum: 0.9
+weight_decay: 0.000005
+snapshot: 2000
+snapshot_prefix: "../other_model/alexnet_bit_pratition"
+solver_mode: GPU
+test_initialization: false
+
+#origine solver
+# net: "models/bvlc_alexnet/train_val.prototxt"
+# # test_iter: 250
+# # test_interval: 12000
+# base_lr: 0.001
+# lr_policy: "multistep"
+# gamma: 0.1
+# stepvalue: 48000
+# stepvalue: 84000
+# display: 20
+# #max_iter: 78000
+# max_iter: 162000
+# momentum: 0.9
+# weight_decay: 0.00005
+# snapshot: 6000
+# snapshot_prefix: "models/bvlc_alexnet/alexnet-BN"
+# solver_mode: GPU

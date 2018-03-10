@@ -1,0 +1,241 @@
+name: "LeNet"
+layer {
+  name: "mnist"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TRAIN
+  }
+  transform_param {
+    scale: 0.00390625
+  }
+  data_param {
+    source: "mnist_train_lmdb"
+    batch_size: 64
+    backend: LMDB
+  }
+}
+layer {
+  name: "mnist"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    scale: 0.00390625
+  }
+  data_param {
+    source: "mnist_test_lmdb"
+    batch_size: 100
+    backend: LMDB
+  }
+}
+
+layer {
+  name: "quantized_data"
+  type: "Quantization"
+  bottom: "data"
+  top: "quantized_data"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 4
+    range: 0.0
+    range: 0.996094
+  }
+}
+
+
+layer {
+  name: "conv1"
+  type: "QuanConvolution"
+  bottom: "quantized_data"
+  top: "conv1"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  quan_convolution_param {
+    num_output: 20
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+    bit_width: 4
+    range_high: 0.526403
+    range_low: -0.480178
+  }
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+layer {
+  name: "quantized_pool1"
+  type: "Quantization"
+  bottom: "pool1"
+  top: "quantized_pool1"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 4
+    range: -2.687143 
+    range: 4.018192
+  }
+}
+
+layer {
+  name: "conv2"
+  type: "QuanConvolution"
+  bottom: "quantized_pool1"
+  top: "conv2"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  quan_convolution_param {
+    num_output: 50
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+    bit_width: 4
+    range_high: 0.179069
+    range_low: -0.143537
+  }
+}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "conv2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+layer {
+  name: "quantized_pool2"
+  type: "Quantization"
+  bottom: "pool2"
+  top: "quantized_pool2"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 4
+    range: -10.569159
+    range: 10.587986
+  }
+}
+
+layer {
+  name: "ip1"
+  type: "QuanInnerProduct"
+  bottom: "quantized_pool2"
+  top: "ip1"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  quan_inner_product_param {
+    num_output: 500
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+    bit_width: 4
+    range_low: -0.094222
+    range_high:  0.097742
+  }
+}
+layer {
+  name: "relu1"
+  type: "ReLU"
+  bottom: "ip1"
+  top: "relu1"
+}
+
+layer {
+  name: "quantized_relu1"
+  type: "Quantization"
+  bottom: "relu1"
+  top: "quantized_relu1"
+  quantization_param {
+    round_method: FLOOR
+    round_strategy: AGGRESSIVE
+    bit_width: 4
+    range: -10.569159
+    range: 10.587986
+  }
+}
+
+layer {
+  name: "ip2"
+  type: "QuanInnerProduct"
+  bottom: "quantized_relu1"
+  top: "ip2"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  quan_inner_product_param {
+    num_output: 10
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+    bit_width: 4
+    range_low: -0.243986
+    range_high: 0.215615
+  }
+}
+layer {
+  name: "accuracy"
+  type: "Accuracy"
+  bottom: "ip2"
+  bottom: "label"
+  top: "accuracy"
+  include {
+    phase: TEST
+  }
+}
+layer {
+  name: "loss"
+  type: "SoftmaxWithLoss"
+  bottom: "ip2"
+  bottom: "label"
+  top: "loss"
+}
