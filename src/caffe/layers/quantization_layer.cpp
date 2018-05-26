@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <vector>
 #include <limits>
+#include <iostream>
 
 #include "caffe/layers/quantization_layer.hpp"
 
@@ -40,6 +41,10 @@ void QuantizationLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 	for (int i = 0; i < count; ++i) {
 		top_data[i] = fixed_point(bottom_data[i], scaling_factor,
 				min_value, max_value);
+		// if(i < 1)
+		//   {
+		//     std::cout << "bottom_data" << i << "=" << bottom_data[i] << "  ;top_data" << i << "=" << top_data[i] << std::endl;
+		//   }
 	}
 }
 
@@ -83,7 +88,6 @@ void QuantizationLayer<Dtype>::analyze_scaling_factor(double& scaling_factor,
 	default:
 		LOG(FATAL) << "Unknown round strategy.";
 	}
-
 }
 
 template <typename Dtype>
@@ -121,7 +125,6 @@ void QuantizationLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 
   if (!propagate_down[0]) { return; }
 
-  const Dtype* bottom_data = bottom[0]->cpu_data();  
   const Dtype* top_diff = top[0]->cpu_diff();  
   Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();  
   const int count = bottom[0]->count();  

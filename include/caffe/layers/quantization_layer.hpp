@@ -55,7 +55,14 @@ protected:
 	 * the forward pass
 	 */
 	virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
-				  const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+		  const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+
+
+  ////////////GPU///////////////
+	// virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+	// 		const vector<Blob<Dtype>*>& top);
+	// virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+	// 	  const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 
 private:
 	// instance variables
@@ -88,6 +95,14 @@ private:
 	 */
 	void analyze_scaling_factor(double& scaling_factor, double& min_value,
 			double& max_value) const;
+
+  /////////GPU
+	// Dtype fixed_point_gpu(const Dtype& input_data, const double& scaling_factor,
+	// 		const double& min_value, const double& max_value) const;
+
+	// void analyze_scaling_factor_gpu(double& scaling_factor, double& min_value,
+	// 		double& max_value) const;
+
 };
 
 }		// namespace caffe

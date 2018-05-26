@@ -1,0 +1,16 @@
+net: "quan_aw_train_val.prototxt"
+test_iter: 250
+test_interval: 1000
+base_lr: 0.00000005
+lr_policy: "multistep"
+gamma: 0.1
+stepvalue: 60000
+stepvalue: 120000
+display: 100
+max_iter: 160000
+momentum: 0.9
+weight_decay: 0.00005
+snapshot: 5000
+snapshot_prefix: "../other_model/alexnet_a8_w8"
+solver_mode: GPU
+#test_initialization: false
