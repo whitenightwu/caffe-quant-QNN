@@ -622,6 +622,7 @@ message ConvolutionParameter {
   // implementation; for input blobs with num_axes != 2, this option is
   // ignored and the ND implementation will be used.)
   optional bool force_nd_im2col = 17 [default = false];
+
 }
 
 message CropParameter {
@@ -1460,6 +1461,36 @@ message QuanInnerProductParameter {
   // of the weight matrix. The weight matrix itself is not going to be transposed
   // but rather the transfer flag of operations will be toggled accordingly.
   optional bool transpose = 6 [default = false];
+
+  /******************************************/	
+  //quantization
+
+  // Round method of quantization
+  enum RoundMethod {
+  ROUND = 0;
+  FLOOR = 1;
+  CEIL = 2;
+  TRUNC = 3;
+  }
+  optional RoundMethod round_method = 7 [default = FLOOR]; 
+  
+  // Round strategy of quantization 
+  enum RoundStrategy {
+  CONSERVATIVE = 0;
+  NEUTRAL = 1;
+  AGGRESSIVE = 2;
+  }
+  optional RoundStrategy round_strategy = 8 [default = AGGRESSIVE];
+  
+  // Total bit width (including sign bit, integer part, and fraction part)
+  optional int32 bit_width = 9 [default = 4];
+  
+  // Range of input data 
+  optional float range_low = 10 [default = 1];
+  optional float range_high = 11 [default = 1];
+
+  //run-time
+  optional bool is_runtime = 12 [default = false];
 }
 
 message QuanConvolutionParameter {
@@ -1513,4 +1544,34 @@ message QuanConvolutionParameter {
   // implementation; for input blobs with num_axes != 2, this option is
   // ignored and the ND implementation will be used.)
   optional bool force_nd_im2col = 17 [default = false];
+
+  /******************************************/	
+  //quantization
+
+  // Round method of quantization
+  enum RoundMethod {
+  ROUND = 0;
+  FLOOR = 1;
+  CEIL = 2;
+  TRUNC = 3;
+  }
+  optional RoundMethod round_method = 20 [default = FLOOR]; 
+  
+  // Round strategy of quantization 
+  enum RoundStrategy {
+  CONSERVATIVE = 0;
+  NEUTRAL = 1;
+  AGGRESSIVE = 2;
+  }
+  optional RoundStrategy round_strategy = 21 [default = AGGRESSIVE];
+  
+  // Total bit width (including sign bit, integer part, and fraction part)
+  optional int32 bit_width = 22 [default = 4];
+  
+  // Range of input data 
+  optional float range_low = 23 [default = 1];
+  optional float range_high = 24 [default = 1];
+
+  //run-time
+  optional bool is_runtime = 25 [default = false];
 }

@@ -40,7 +40,7 @@ void QuanConvolutionLayer<Dtype>::Weight_Quantization(Dtype& weights)
       std::numeric_limits<Dtype>::infinity();
     Dtype pos_scaling_factor = (range_high_ > 0) ? log2(max_value/range_high_) :
       std::numeric_limits<Dtype>::infinity();
-    
+    //    LOG(INFO) << " pos_scaling_factor" << pos_scaling_factor <<  "  neg_scaling_factor" << neg_scaling_factor;
     switch (round_strategy_)
       {
       case QuanInnerProductParameter_RoundStrategy_CONSERVATIVE:
@@ -56,7 +56,7 @@ void QuanConvolutionLayer<Dtype>::Weight_Quantization(Dtype& weights)
 	LOG(FATAL) << "Unknown round strategy.";
       }
     /******************************************/
-
+    //LOG(INFO) << " scaling_factor" << scaling_factor << " min_value" << min_value << "   max_value" << max_value;
     Dtype weight_rounded;
     switch (round_method_) 
       {
@@ -112,22 +112,37 @@ void QuanConvolutionLayer<Dtype>::Weight_Quantization(Dtype& weights)
     round_strategy_ = this->layer_param_.quan_convolution_param().round_strategy();
 
     // read range
+    is_runtime_ = this->layer_param_.quan_convolution_param().is_runtime();
     range_low_ = this->layer_param_.quan_convolution_param().range_low();
     range_high_ = this->layer_param_.quan_convolution_param().range_high();
-    //   std::cout << "+++++++++++++++++get:" << "round_method=" <<round_method_ << ";  bit_width=" << bit_width_ <<std::endl;
+    if(range_low_ == range_high_ )
+      is_runtime_ = 1;
+
+    std::cout << "ydwu=======get:" << std::endl;
+    std::cout << "bit_width=" << bit_width_ << ";  round_method=" << round_method_ << ";  round_strategy=" << round_strategy_ << ";  is_runtime=" << is_runtime_ << ";  range_low=" << range_low_ << ";  range_high=" << range_high_ << std::endl;
   }
 
   template <typename Dtype>
   void QuanConvolutionLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
 						const vector<Blob<Dtype>*>& top) {
-  /***********************get range*************************/
+
+    std::cout << "ydwu=======origine:" << this->blobs_[0]->cpu_data()[1] <<std::endl;
+    /***********************get range*************************/
   //  LOG(INFO) << "range_high_ =" << range_high_ << ";range_low_ =" << range_low_;
   Dtype* tmp_weight = (Dtype*) malloc((this->blobs_[0]->count())*sizeof(Dtype));
-  caffe_copy(this->blobs_[0]->count(), this->blobs_[0]->cpu_data(), tmp_weight);
+  caffe_copy(this->blobs_[0]->count(), this->blobs_[0]->cpu_data(), tmp_weight);  
+
   Dtype* Q_weight = const_cast<Dtype*>(tmp_weight);
+  // std::cout << "ydwu=======xxxxxxx:" << this->blobs_[0]->cpu_data()[1] <<std::endl;
+
+  // Dtype* Q_weight = const_cast<Dtype*>(this->blobs_[0]->cpu_data());
+  // std::cout << "ydwu=======xxxxxxx:" << this->blobs_[0]->cpu_data()[1] <<std::endl;
+
+
+  // std::cout << "ydwu=======get:" << std::endl;
   ///// get range_high_ and range_low_.
-  // LOG(INFO) << "+++range_high_ =" << range_high_ << ";++++range_low_ =" << range_low_;
-  if((range_high_ ==  1) && (range_low_ ==  1))
+  //  std::cout << "old-range_high =" << range_high_ << ";   old-range_low =" << range_low_ << std::endl;
+  if(is_runtime_)
     {
       Dtype* sort_weight = tmp_weight;
       int qcount_ = this->blobs_[0]->count();
@@ -135,20 +150,17 @@ void QuanConvolutionLayer<Dtype>::Weight_Quantization(Dtype& weights)
       range_high_ = sort_weight[qcount_-1];
       range_low_ = sort_weight[0];
     }
-   LOG(INFO) << "range_high_ =" << range_high_ << ";range_low_ =" << range_low_;
 
-   std::cout << "test:" << "round_method=" << round_method_ << ";  bit_width=" << bit_width_ <<std::endl;
+    // std::cout << "ydwu=======get:" << std::endl;
+    // std::cout << "bit_width=" << bit_width_ << ";  round_method=" << round_method_ << ";  round_strategy=" << round_strategy_ << ";  is_runtime=" << is_runtime_ << ";  range_low=" << range_low_ << ";  range_high=" << range_high_ << std::endl;
+
     for (int i = 0; i < (this->blobs_[0]->count()); ++i) 
       {
 	Weight_Quantization(*(Q_weight+i));
       }
     const Dtype *weight = Q_weight;
 
-    // for (int i = 0; i < 1; ++i) 
-    //   {
-    // 	std::cout << "new--cpu_data" << this->blobs_[0]->cpu_data()[i] << std::endl;
-    //   }
- 
+
     /**************************************/
     // const Dtype* weight = this->blobs_[0]->cpu_data();
 
@@ -156,56 +168,72 @@ void QuanConvolutionLayer<Dtype>::Weight_Quantization(Dtype& weights)
     // for (int i = 0; i < 1; ++i) 
     //   std::cout << "comput--weight" << weight[i] << std::endl;
 
+    std::cout << "ydwu==========quan:" << this->blobs_[0]->cpu_data()[1] <<std::endl;
+      
     for (int i = 0; i < bottom.size(); ++i) {
       const Dtype* bottom_data = bottom[i]->cpu_data();
       Dtype* top_data = top[i]->mutable_cpu_data();
       for (int n = 0; n < this->num_; ++n) {
 	this->forward_cpu_gemm(bottom_data + n * this->bottom_dim_, weight,
-			       top_data + n * this->top_dim_);
+			      top_data + n * this->top_dim_);
 	if (this->bias_term_) {
 	  const Dtype* bias = this->blobs_[1]->cpu_data();
 	  this->forward_cpu_bias(top_data + n * this->top_dim_, bias);
 	}
       }
     }
-
+  free(tmp_weight);
   }
 
   template <typename Dtype>
   void QuanConvolutionLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 		const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-    const Dtype* weight = this->blobs_[0]->cpu_data();
 
-    for (int i = 0; i < 1; ++i) 
-      std::cout << "BP--weight" << weight[i] << std::endl;
+    // const Dtype* weight = this->blobs_[0]->cpu_data();
+    // const float* data_vec = cpu_data();
 
-    Dtype* weight_diff = this->blobs_[0]->mutable_cpu_diff();
-    for (int i = 0; i < top.size(); ++i) {
-      const Dtype* top_diff = top[i]->cpu_diff();
-      const Dtype* bottom_data = bottom[i]->cpu_data();
-      Dtype* bottom_diff = bottom[i]->mutable_cpu_diff();
-      // Bias gradient, if necessary.
-      if (this->bias_term_ && this->param_propagate_down_[1]) {
-	Dtype* bias_diff = this->blobs_[1]->mutable_cpu_diff();
-	for (int n = 0; n < this->num_; ++n) {
-	  this->backward_cpu_bias(bias_diff, top_diff + n * this->top_dim_);
-	}
+
+
+    std::cout << "back====ydwu==========origine:" << this->blobs_[0]->cpu_data()[1] <<std::endl;
+    const Dtype* tmp_weight = this->blobs_[0]->cpu_data();
+    Dtype* Q_weight = const_cast<Dtype*>(tmp_weight);
+
+    for (int i = 0; i < (this->blobs_[0]->count()); ++i) 
+      {
+	Weight_Quantization(*(Q_weight+i));
       }
-      if (this->param_propagate_down_[0] || propagate_down[i]) {
-	for (int n = 0; n < this->num_; ++n) {
-	  // gradient w.r.t. weight. Note that we will accumulate diffs.
-	  if (this->param_propagate_down_[0]) {
-	    this->weight_cpu_gemm(bottom_data + n * this->bottom_dim_,
-				  top_diff + n * this->top_dim_, weight_diff);
-	  }
-	  // gradient w.r.t. bottom data, if necessary.
-	  if (propagate_down[i]) {
-	    this->backward_cpu_gemm(top_diff + n * this->top_dim_, weight,
-				    bottom_diff + n * this->bottom_dim_);
-	  }
-	}
-      }
-    }
+    std::cout << "back====ydwu==========quan:" << this->blobs_[0]->cpu_data()[1] <<std::endl;
+
+
+    
+    // Dtype* weight_diff = this->blobs_[0]->mutable_cpu_diff();
+    // for (int i = 0; i < top.size(); ++i) {
+    //   const Dtype* top_diff = top[i]->cpu_diff();
+    //   const Dtype* bottom_data = bottom[i]->cpu_data();
+    //   Dtype* bottom_diff = bottom[i]->mutable_cpu_diff();
+    //   // Bias gradient, if necessary.
+    //   if (this->bias_term_ && this->param_propagate_down_[1]) {
+    // 	Dtype* bias_diff = this->blobs_[1]->mutable_cpu_diff();
+    // 	for (int n = 0; n < this->num_; ++n) {
+    // 	  this->backward_cpu_bias(bias_diff, top_diff + n * this->top_dim_);
+    // 	}
+    //   }
+    //   if (this->param_propagate_down_[0] || propagate_down[i]) {
+    // 	for (int n = 0; n < this->num_; ++n) {
+    // 	  // gradient w.r.t. weight. Note that we will accumulate diffs.
+    // 	  if (this->param_propagate_down_[0]) {
+    // 	    this->weight_cpu_gemm(bottom_data + n * this->bottom_dim_,
+    // 				  top_diff + n * this->top_dim_, weight_diff);
+    // 	  }
+    // 	  // gradient w.r.t. bottom data, if necessary.
+    // 	  if (propagate_down[i]) {
+    // 	    this->backward_cpu_gemm(top_diff + n * this->top_dim_, weight,
+    // 				    bottom_diff + n * this->bottom_dim_);
+    // 	  }
+    // 	}
+    //   }
+    // }
+    
   }
 
 #ifdef CPU_ONLY

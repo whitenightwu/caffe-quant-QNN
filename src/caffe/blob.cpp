@@ -482,10 +482,12 @@ void Blob<Dtype>::FromProto(const BlobProto& proto, bool reshape) {
       }
     }
     Reshape(shape);
+    LOG(INFO) << shape[0] << "  " << shape[1] << "  " << shape[2] << "  " << shape[3];
   } else {
     CHECK(ShapeEquals(proto)) << "shape mismatch (reshape not set)";
   }
   // copy data
+  //  LOG(INFO) << proto.num() << "  " << proto.channels() << "  " << proto.height() << "  " << proto.width() << "   " << proto.data_size();
   Dtype* data_vec = mutable_cpu_data();
   if (proto.double_data_size() > 0) {
     CHECK_EQ(count_, proto.double_data_size());

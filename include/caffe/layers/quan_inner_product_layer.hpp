@@ -26,12 +26,12 @@ class QuanInnerProductLayer : public Layer<Dtype> {
  protected:
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
-  // virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
-  //     const vector<Blob<Dtype>*>& top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
   virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
-  // virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
-  //     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 
   int M_;
   int K_;
@@ -46,7 +46,7 @@ class QuanInnerProductLayer : public Layer<Dtype> {
   float range_low_, range_high_;
   QuanInnerProductParameter_RoundMethod round_method_;
   QuanInnerProductParameter_RoundStrategy round_strategy_;
-
+  bool is_runtime_;
 
   //   void Weight_Quantization(Dtype& weights, float range_low_, float range_high_, int bit_width_ , QuanInnerProductParameter_RoundStrategy round_strategy_, QuanInnerProductParameter_RoundMethod round_method_);
   void Weight_Quantization(Dtype& weights);
